@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>My Hakyll Blog - 2015-04-26-a-monadic-way-to-compute-power-set</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">My Hakyll Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>2015-04-26-a-monadic-way-to-compute-power-set</h1>
+
+            <div class="info">
+    Posted on April 26, 2015
+    
+</div>
+
+<p>I was working on a problem earlier this week which requires computing the power set of a given set (represented as a list with no duplicate elements):</p>
+<pre><code>powerSet xs :: [a] -&gt; [[a]]</code></pre>
+<p>The power set of a set <code>S</code> is a set of all the subsets of <code>S</code>. For example, <code>powerSet [1,2,3]</code> would give you <code>[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]</code>. The output list doesn’t need to be in this particular order since it’s actually a set.</p>
+<p>In fact, <code>Data.list.subsequences</code> does it for you. But I wasn’t acquainted with that gentleman so I was googling and hoogling around. I’m glad I did, because I bumped into this<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
+<pre><code>import Control.Monad
+powerSet xs :: [a] -&gt; [[a]]
+powerSet    =  filterM (const [True,False])</code></pre>
+<p>I don’t know you, but when I first saw this I was like, WTF!? How can this possibily compute the power set? It looks sooo irrelevant. It went more mysterious if you check out what <code>const</code> does:</p>
+<pre><code>const     :: a -&gt; b -&gt; a
+const x _ =  x</code></pre>
+<p>Seriously, WTF!? <code>const</code> takes two things, tosses the second and just gives the first right back? How is that even useful?</p>
+<p>Of course it does compute the power set. It took me a while to figure out and this process completely led me away from what I was doing. But the moment I figured it out, I was like, “Oh fuck! Oh fuck fuck fuck!!!” for a whole minute. My mind was so blown away, that I had to ran out to find a coffee shop to clear my mind and write this post you are now reading.</p>
+<p>It’s really just take all the pieces and fit them together. So let’s get started, shall we?</p>
+<p>The first thing to recall is the good old <code>filter</code> functoin.</p>
+<pre><code>filter :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></pre>
+<p>So how is <code>filterM</code> different?</p>
+<pre><code>filterM          :: (Monad m) =&gt; (a -&gt; m Bool) -&gt; [a] -&gt; m [a]
+filterM _ []     =  return []
+filterM p (x:xs) =  do
+  flg &lt;- p x
+  ys  &lt;- filterM p xs
+  return (if flg then x:ys else ys)</code></pre>
+<p>I find it a bit clearer to unravel the <code>do</code> syntactic sugar:</p>
+<pre><code>filterM p (x:xs) =
+  p x          &gt;&gt;= \flg -&gt;
+  filterM p xs &gt;&gt;= \ys  -&gt;
+  return (if flg then x:ys else ys)</code></pre>
+<p>In English, <code>filterM</code> takes a monadic predicate <code>p</code> and a list <code>(x:xs)</code>. It applies <code>p</code> to <code>x</code>. The result is of type <code>m Bool</code> - the monadic version of <code>Bool</code>, and this result, together with another function <code>\flg -&gt; ...</code>, are passed to <code>&gt;&gt;=</code>. Remember that <code>&gt;&gt;=</code>, the <code>bind</code> operator, takes two arguments.</p>
+<p>Now we want to think what <code>&gt;&gt;=</code> does. To do that we have to be specific about which monad we’re dealing with exactly. Note that the <code>powerSet</code> above returns a <code>[[a]]</code>, meaning the <code>Monad m</code> in <code>filterM</code> here must be the list monad. So <code>p x</code> is of type <code>[Bool]</code>. Then <code>&gt;&gt;=</code> is apparently the one from the list monad as well. We know what it does<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>:</p>
+<pre><code>(&gt;&gt;=)      :: [a] -&gt; (a -&gt; [b]) -&gt; [b]
+(&gt;&gt;=) xs f =  concat (map f xs)</code></pre>
+<p><code>&gt;&gt;=</code> takes a list <code>xs</code> and a function <code>f</code> which somehow transforms each element in <code>xs</code> into a list, applies <code>f</code> to each element and <code>concat</code> the resulting lists into one big list.</p>
+<p>In this case sine <code>p</code> is <code>const [True,False]</code>, <code>p x</code> is really just <code>[True,False]</code>, no matter what <code>x</code> is. So we feed <code>[True,False]</code> into <code>&gt;&gt;=</code>, and <code>&gt;&gt;=</code> applies <code>\flg -&gt; ...</code> to <code>True</code> and <code>False</code>.</p>
+<p>The point is not that you can do this in a somewhat twisted way. You could just call <code>Data.List.subsequences</code>. The point is that there’s a</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>An alternative is to replace <code>(const [True,False])</code> with <code>(\_ -&gt; [True,False])</code>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>GHC implements it as <code>m &gt;&gt;= k = foldr ((++) . k) [] m</code>, which is equivalent.<a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

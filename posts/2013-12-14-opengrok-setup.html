@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>My Hakyll Blog - 2013-12-14-opengrok-setup</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">My Hakyll Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>2013-12-14-opengrok-setup</h1>
+
+            <div class="info">
+    Posted on December 14, 2013
+    
+</div>
+
+<p><strong>WARNING: the source paths of rsync commands MUST have a trailing slash!!! See <a href="http://stay-calm.blogspot.com/2008/10/rsync-be-mindful-of-trailing-slash.html">here</a>.</strong></p>
+<h2 id="initial-setup">1. Initial setup</h2>
+<pre><code>$ cd
+$ git clone https://github.com/harryxp/OpenGrok.git OpenGrok
+$
+$ mkdir -p og-instance-base/src
+$ mv OpenGrok/ og-instance-base/src/    # using OpenGrok to index itself
+$ cd og-instance-base/src/</code></pre>
+<h2 id="build">2. Build</h2>
+<p>Download and install Java 1.7.</p>
+<pre><code>$ cd ~/og-instance-base/src/OpenGrok
+$ ant clean
+$ ant</code></pre>
+<h2 id="deploy-web-app-and-start-the-server">3. Deploy web app and start the server</h2>
+<p>We need to make the app running so step 4 can communicate with it.</p>
+<pre><code>$ cd ~/og-instance-base/src/OpenGrok
+$ rsync --archive --delete dist/lib/ web/WEB-INF/lib
+$ cp dist/opengrok.jar web/WEB-INF/lib/
+
+$ # change CONFIGURATION to ~/og-instance-base/etc/configuration.xml
+$ # this *WILL* be generated
+$ vim web/WEB-INF/web.xml
+
+$ # on Mac
+$ # do this only when you are the sole user
+$ sudo chown $USER /opt/local/share/java/jetty-5.1.10/webapps
+$ echo 'rsync --archive --delete web/ /opt/local/share/java/jetty-5.1.10/webapps/opengrok' &gt; deployweb.sh
+$
+$ # on Debian jessie
+$ # do this only when you are the sole user
+$ sudo chown $USER /var/lib/jetty8/webapps
+$ echo 'rsync --archive --delete web/ /var/lib/jetty8/webapps/opengrok' &gt; deployweb.sh
+
+$ chmod 755 deployweb.sh
+$ ./deployweb.sh
+
+$ # on Mac
+$ cd /opt/local/share/java/jetty-5.1.10/
+$
+$ # on Debian jessie
+$ cd /usr/share/jetty8/
+
+$ # on Mac, error is caused by not having configuration.xml.  ignore it
+$ java -jar start.jar</code></pre>
+<h2 id="index-source-files">4. Index source files</h2>
+<pre><code>$ mkdir -p ~/og-instance-base/etc
+$ mkdir -p ~/og-instance-base/data
+$ cd ~/og-instance-base/src/OpenGrok
+$
+$ export JAVA_HOME=$(/usr/libexec/java_home)    # Mac only
+$
+$ export OPENGROK_VERBOSE=true
+$ export OPENGROK_PROGRESS=true                 # turn this off for performance
+$ export OPENGROK_INSTANCE_BASE=~/og-instance-base
+$ export OPENGROK_WEBAPP_CONTEXT=opengrok
+$ ./OpenGrok index ~/og-instance-base/src</code></pre>
+<h2 id="appendix-a.-refresh-indexes">APPENDIX A. Refresh indexes</h2>
+<pre><code>$ export JAVA_HOME=$(/usr/libexec/java_home)    # Mac only
+$
+$ export OPENGROK_VERBOSE=true
+$ export OPENGROK_PROGRESS=true                 # turn this off for performance
+$ export OPENGROK_INSTANCE_BASE=~/og-instance-base
+$ export OPENGROK_WEBAPP_CONTEXT=opengrok
+$ ./OpenGrok update</code></pre>
+<p>One-liner:</p>
+<pre><code>$ OPENGROK_VERBOSE=true OPENGROK_PROGRESS=true OPENGROK_INSTANCE_BASE=~/og-instance-base OPENGROK_WEBAPP_CONTEXT=opengrok ./OpenGrok update</code></pre>
+<h2 id="appendix-b.-development">APPENDIX B. Development</h2>
+<p>For lightweight development, if you have changed the Java code or changed/updated git branch, you can do</p>
+<pre><code>$ cd ~/og-instance-base/src/OpenGrok
+$ ant clean
+$ ant
+$ rsync --archive --delete dist/lib/ web/WEB-INF/lib
+$ cp dist/opengrok.jar web/WEB-INF/lib/
+$ ./deployweb.sh
+$ rm -rf ~/og-instance-base/data/*
+$ OPENGROK_VERBOSE=true OPENGROK_PROGRESS=true OPENGROK_INSTANCE_BASE=~/og-instance-base OPENGROK_WEBAPP_CONTEXT=opengrok ./OpenGrok index ~/og-instance-base/src</code></pre>
+<p>If only JSP/JS was changed, run <code>./deployweb.sh</code> is enough.</p>
+<p>For more serious development, see <a href="https://github.com/OpenGrok/OpenGrok/wiki/Developer-intro">this page on OpenGrok wiki</a>. Using NetBeans as the core team does makes it much easier to run test cases and debug. If you have trouble installing it, download the zip archive without installer. If you are using a non-conventional window manager (I use xmonad), you may see nothing more than a blank window. Try it with <code>_JAVA_AWT_WM_NONREPARENTING=1</code>.</p>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

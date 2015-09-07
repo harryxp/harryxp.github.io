@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>My Hakyll Blog - 2015-05-06-performance-tuning-a-large-postgres-table</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">My Hakyll Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>2015-05-06-performance-tuning-a-large-postgres-table</h1>
+
+            <div class="info">
+    Posted on May  6, 2015
+    
+</div>
+
+<p>I’m not a DBA. I just learn as I go. Recently I learned quite a bit from a performance tuning done on a large Postgres table.</p>
+<p>I have to keep the real informatoin confidental so I’ll give an example similar in nature. Say we are given 20 million records. Each record has a person ID as the unique key, and demographic information about this person - gender, age, zip code, gamer or not, etc. The use case is to count the number of people that satisfy certain criteria based on their attributes. For example, we may want to know the number of female gamers who don’t smoke.</p>
+<p>One way to solve this problem is to store the information in a Postgres table like this:</p>
+<pre><code>    Table &quot;public.people&quot;
+   Column   |  Type   | Modifiers
+------------+---------+-----------
+ id         | integer | not null
+ attributes | hstore  |
+Indexes:
+    &quot;people_pkey&quot; PRIMARY KEY, btree (id)</code></pre>
+<p><a href="http://www.postgresql.org/docs/9.4/static/hstore.html"><code>hstore</code></a> is the Postgres hash map data type.</p>
+<p>Then the above question can be answered by this query, assuming attributes <code>gender</code>, <code>gamer</code> and <code>smoker</code> do exist:</p>
+<pre><code>select count(id) from people
+where
+    attributes-&gt;'gender'='female' and
+    attributes-&gt;'gamer'='t' and
+    attributes-&gt;'smoker'='f'
+;</code></pre>
+<p>When I was doing this, there were 100+ attributes and the table was about 20 GB. This query really can’t be optimized much since it needs to go through all the rows to compute the result. It usually returned within 5 minutes, which wasn’t too bad really. At least it met the requirement.</p>
+<p>Here comes the problem. Once in a while we need to introduce new attributes for each person, that is, updating all the 20 million rows. However, according to the <a href="http://www.postgresql.org/docs/9.4/static/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY">official document</a>,</p>
+<blockquote>
+<p>In PostgreSQL, an UPDATE or DELETE of a row does not immediately remove the old version of the row.</p>
+</blockquote>
+<p>This operation doubles the size of the table and makes the query much, much slower due to extra IO. One possible fix is to run vacuum after every such operation, but our client … has higher standards. They essentially changed the spec and said the query needs to return within two minutes.</p>
+<p>Well that’s pretty exciting. The good news was that we already knew the bottleneck was IO. Save IO, save the world. Following this thought I designed a way to reduce the table size dramatically using <a href="http://www.postgresql.org/docs/9.4/static/datatype-binary.html"><code>bytea</code></a>, because, well, few things are more compact than bitmaps.</p>
+<p>Most of these attributes are enumerable. That is, the possible values of an attribute is a known set. So we just need an encoding scheme to represent values for each attribute with bits. I ended up doing a very simple one by sorting all enumerable attributes by name, then for each attribute, compute the number of bits needed to represent all its values, then sort its values, assign each value with corresponding bits. As an example, say we need to encode the attribute “ethnic group”. The possible values are: African American, White, Asian, Hispanic, and Others. That’s 5, plus 1, which is used when the attribute is absent for this person. We’d end up with 3 bits:</p>
+<pre><code>(absent)                000
+African American        001
+Asian                   010
+Hispanic                011
+Others                  100
+White                   101</code></pre>
+<p>As a convention I always used all-zeros to represent an absent attribute.</p>
+<p>When you concatenate many such bits together to form a bitmap, you’ll have to store each attribute’s position in the bitmap and length somewhere, or you wouldn’t know how to interpret the bitmap. Furthermore, an attribute value may sit across the byte border so you need to do some shifting and masking tricks when extracting it. I built the logic around the Postgres <a href="http://www.postgresql.org/docs/9.4/static/functions-binarystring.html"><code>get_byte</code></a> function and it worked pretty well. We still have to deal with non-enumerable attributes but they are few so we just keep using hstore for them. I ended up with a table smaller than 3 GB and that gave me &lt; 1 min query time!</p>
+<p>The downside is that the code is harder to read, and the table has become unreadable with bytea. In addition, changes to any attribute metadata potentially requires a re-encoding of all the rows (e.g., adding a new attribute changes the bitmap layout). But since the table is much smaller it’s not a big problem.</p>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
