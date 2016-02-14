@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Harry Pan's Blog - OpenGrok Indexer Code Analysis</title>
+        <title>Peachful Space - OpenGrok Indexer Code Analysis</title>
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
     </head>
     <body>
         <div id="header">
             <div id="logo">
-                <a href="../">Harry Pan's Blog</a>
+                <a href="../">Peachful Space</a>
             </div>
             <div id="navigation">
                 <a href="../">Home</a>
@@ -55,9 +55,9 @@ $ ./OpenGrok index ~/og-instance-base/src</code></pre>
 <pre><code>${JAVA}                                             /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
     ${JAVA_OPTS}                                        -Xmx2048m
     ${PROPERTIES}                                       -Dorg.opensolaris.opengrok.history.git=/usr/bin/git
-    ${LOGGER_PROPERTIES}                                -Djava.util.logging.config.file=/home/harry/og-instance-base/logging.properties
+    ${LOGGER_PROPERTIES}                                -Djava.util.logging.config.file=/var/opengrok/logging.properties
     ${JAVA_DEBUG}
-    -jar ${OPENGROK_JAR}                                -jar /home/harry/og-instance-base/src/OpenGrok/dist/opengrok.jar
+    -jar ${OPENGROK_JAR}                                -jar /var/opengrok/src/OpenGrok/dist/opengrok.jar
     ${IGNORE_PATTERNS}
     ${DERBY_OPTIONS}
     ${HISTORY_TAGS}
@@ -73,13 +73,13 @@ $ ./OpenGrok index ~/og-instance-base/src</code></pre>
     ${SKIN}
     ${LEADING_WILDCARD}                                 -a on
     ${READ_XML_CONF}
-    -W ${XML_CONFIGURATION}                             -W /home/harry/og-instance-base/etc/configuration.xml
+    -W ${XML_CONFIGURATION}                             -W /var/opengrok/etc/configuration.xml
     ${SCAN_FOR_REPOSITORY}                              -S
     ${ENABLE_PROJECTS}                                  -P
     ${WEBAPP_CONFIG}                                    -U localhost:2424
     ${WEBAPP_CONTEXT}                                   -w opengrok
-    -s ${SRC_ROOT}                                      -s /home/harry/og-instance-base/src
-    -d ${DATA_ROOT}&quot;                                    -d /home/harry/og-instance-base/data
+    -s ${SRC_ROOT}                                      -s /var/opengrok/src
+    -d ${DATA_ROOT}&quot;                                    -d /var/opengrok/data
     &quot;${@}&quot;                                              -H</code></pre>
 <p>Knowing what parameters are actually passed to java is extremely helpful down the road. Let’s follow the code flow.</p>
 <pre><code>./OpenGrok index ~/og-instance-base/src
@@ -113,7 +113,7 @@ org/opensolaris/opengrok/index/Indexer.java         &lt;------------------------
                 searchRepositories      -S, true
                 addProjects             -P, true
                 defaultProject          -p, null
-                configFilename          -W, /home/harry/og-instance-base/etc/configuration.xml
+                configFilename          -W, /var/opengrok/etc/configuration.xml
                 refreshHistory          -H, true
                 listFiles                   false
                 createDict                  false
@@ -152,11 +152,11 @@ org/opensolaris/opengrok/index/Indexer.java         &lt;------------------------
                                 dbs.add(new IndexDatabase(project))                     # each IndexDatabase corresponds to one project
                                     new SimpleFSLockFactory()
                                     initialize()
-                                        indexDir points to /home/harry/og-instance-base/data/index/&lt;project&gt;
+                                        indexDir points to /var/opengrok/data/index/&lt;project&gt;
                                         indexDirectory = FSDirectory.open(indexDir, ...)        # Lucene directory
                                         analyzerGuru = new AnalyzerGuru()
-                                        xrefDir points to /home/harry/og-instance-base/data/xref/
-                                        dirtyFile points to /home/harry/og-instance-base/data/index/&lt;project&gt;/dirty
+                                        xrefDir points to /var/opengrok/data/xref/
+                                        dirtyFile points to /var/opengrok/data/index/&lt;project&gt;/dirty
                             for each db in dbs                                                  # each iteration/thread handles one project
                                 executor.submit(new Runnable() { run() { db.update() } })       # multithreading starts
                     else if (env.isOptimizeDatabase())                          |
@@ -182,7 +182,7 @@ IndexDatabase.update()              &lt;----------------------------------------
     writer.commit()                                     # to make sure index exists on disk
     directories.add(project.getPath())
     for each dir in directories
-        sourceRoot points to /home/harry/og-instance-base/src/&lt;project&gt;
+        sourceRoot points to /var/opengrok/src/&lt;project&gt;
         HistoryGuru.ensureHistoryCacheExists(sourceRoot)
         startuid corresponds to top project dir
         reader = DirectoryReader.open(indexDirectory)
