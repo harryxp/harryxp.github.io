@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Peachful Space - Notes on the Debian Reference</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Peachful Space</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Notes on the Debian Reference</h1>
+
+            <div class="info">
+    Posted on December 24, 2014
+    
+</div>
+
+<p>By the time of writing, the version of the <a href="https://www.debian.org/doc/manuals/debian-reference/">Debian Reference</a> is: Debian Reference (v2) (2014-12-03 15:28:23 UTC).</p>
+<h1 id="gnulinux-tutorials">GNU/Linux tutorials</h1>
+<ul>
+<li>Virtual consoles
+<ul>
+<li>not in GUI: Alt+F1 - Alt+F6</li>
+<li>in X Window: Ctrl+Alt+F1 - Ctrl+Alt+F7</li>
+<li>from command line: sudo chvt 2</li>
+</ul></li>
+<li>directory permission
+<ul>
+<li>r allows owner to list contents of the directory</li>
+<li>w permission allows owner to add or remove files in the directory</li>
+<li>x permission allows owner to access files in the directory</li>
+<li>x permission on a directory means not only to allow reading of files in that directory but also to allow viewing their attributes, such as the size and the modification time</li>
+</ul></li>
+<li>There are three more special permission bits
+<ul>
+<li>The set user ID bit (s or S instead of user’s x)</li>
+<li>The set group ID bit (s or S instead of group’s x)</li>
+<li>The sticky bit (t or T instead of other’s x)</li>
+</ul></li>
+<li>umask - control of permissions for newly created files</li>
+<li>timestamps
+<ul>
+<li>mtime the file modification time (ls -l)</li>
+<li>ctime the file status change time (ls -lc)</li>
+<li>atime the last file access time (ls -lu)</li>
+<li>Overwriting a file changes all of the mtime, ctime, and atime attributes of the file</li>
+<li>Changing ownership or permission of a file changes the ctime and atime attributes of the file</li>
+<li>Reading a file changes the atime of the file</li>
+</ul></li>
+<li>named pipes (FIFOs)
+<ul>
+<li>created by <code>mkfifo</code></li>
+<li>just like a pipe but with a name</li>
+</ul></li>
+<li>sockets
+<ul>
+<li>similar to named pipe</li>
+<li>allows processes to exchange information even between different computers</li>
+<li>endpoint for IPC</li>
+<li>the internet socket and the Unix domain socket</li>
+</ul></li>
+<li>device files
+<ul>
+<li>physical or virtual devices on your system</li>
+<li>Character device
+<ul>
+<li>Accessed one character at a time</li>
+<li>1 character = 1 byte</li>
+<li>E.g. keyboard device, serial port, …</li>
+</ul></li>
+<li>Block device
+<ul>
+<li>accessed in larger units called blocks</li>
+<li>1 block &gt; 1 byte</li>
+<li>E.g. hard disk, …</li>
+</ul></li>
+</ul></li>
+<li>special device files</li>
+<li>procfs and sysfs</li>
+<li>tmpfs</li>
+</ul>
+<h1 id="debian-package-management">Debian package management</h1>
+<ul>
+<li>/etc/apt/sources.list
+<ul>
+<li>example:
+<ul>
+<li>deb http://ftp.XX.debian.org/debian/ jessie main contrib non-free</li>
+<li>deb-src http://ftp.XX.debian.org/debian/ jessie main contrib non-free</li>
+<li>deb http://security.debian.org/ jessie/updates main contrib</li>
+<li>deb-src http://security.debian.org/ jessie/updates main contrib</li>
+</ul></li>
+<li>The “deb” line defines for the binary packages</li>
+<li>The “deb-src” line defines for the source packages</li>
+<li>The 1st argument is the root URL of the Debian archive</li>
+<li>The 2nd argument is the distribution name: either the suite name (e.g., stable) or the codename (e.g., jessie, jessie-update, jessie-backports)</li>
+<li>The 3rd and following arguments are the list of valid archive area names of the Debian archive</li>
+<li>The URL can be “http://”, “ftp://”, “file://”</li>
+</ul></li>
+<li>advanced operations
+<ul>
+<li><code>COLUMNS=120 dpkg -l &lt;package_name_pattern&gt;</code> list status of an installed package for the bug report</li>
+<li><code>dpkg -L &lt;package_name&gt;</code> list contents of an installed package</li>
+<li><code>dpkg -L &lt;package_name&gt; | egrep '/usr/share/man/man.*/.+'</code> list manpages for an installed package</li>
+<li><code>dpkg -S &lt;file_name_pattern&gt;</code> list installed packages which have matching file name</li>
+<li><code>apt-file search &lt;file_name_pattern&gt;</code> list packages in archive which have matching file name</li>
+<li><code>apt-file list &lt;package_name_pattern&gt;</code> list contents of matching packages in archive</li>
+<li><code>dpkg-reconfigure &lt;package_name&gt;</code> reconfigure the exact package</li>
+<li><code>dpkg-reconfigure -p=low &lt;package_name&gt;</code> reconfigure the exact package with the most detailed question</li>
+<li><code>configure-debian</code> reconfigure packages from the full screen menu</li>
+<li><code>dpkg --audit</code> audit system for partially installed packages</li>
+<li><code>dpkg --configure -a</code> configure all partially installed packages</li>
+<li><code>apt-cache policy &lt;binary_package_name&gt;</code> show available version, priority, and archive information of a binary package</li>
+<li><code>apt-cache madison &lt;package_name&gt;</code> show available version, archive information of a package</li>
+<li><code>apt-cache showsrc &lt;binary_package_name&gt;</code> show source package information of a binary package</li>
+<li><code>apt-get build-dep &lt;package_name&gt;</code> install required packages to build package</li>
+<li><code>aptitude build-dep &lt;package_name&gt;</code> install required packages to build package</li>
+<li><code>apt-get source &lt;package_name&gt;</code> download a source (from standard archive)</li>
+<li><code>dget &lt;URL for dsc file&gt;</code> download a source packages (from other archive)</li>
+<li><code>dpkg-source -x &lt;package_name&gt;_&lt;version&gt;-&lt;debian_version&gt;.dsc</code> build a source tree from a set of source packages (“*.orig.tar.gz&quot; and “<em>.debian.tar.gz“/”</em>.diff.gz”)</li>
+<li><code>debuild binary</code> build package(s) from a local source tree</li>
+<li><code>make-kpkg kernel_image</code> build a kernel package from a kernel source tree</li>
+<li><code>make-kpkg --initrd kernel_image</code> build a kernel package from a kernel source tree with initramfs enabled</li>
+<li><code>dpkg -i &lt;package_name&gt;_&lt;version&gt;-&lt;debian_version&gt;_&lt;arch&gt;.deb</code> install a local package to the system</li>
+<li><code>debi &lt;package_name&gt;_&lt;version&gt;-&lt;debian_version&gt;_&lt;arch&gt;.dsc</code> install local package(s) to the system</li>
+<li><code>dpkg --get-selections '*' &gt;selection.txt</code> save dpkg level package selection state information</li>
+<li><code>dpkg --set-selections &lt;selection.txt</code> set dpkg level package selection state information</li>
+<li><code>echo &lt;package_name&gt; hold | dpkg --set-selections</code> set dpkg level package selection state for a package to hold (equivalent to “aptitude hold <package_name>”)</li>
+<li>grep-dctrl(1), grep-status(1), and grep-available(1)</li>
+<li>apt-rdepends(8)</li>
+</ul></li>
+<li>package metadata:
+<ul>
+<li>/var/lib/apt/lists/</li>
+<li>/var/cache/apt/apt-file/</li>
+<li>/var/lib/apt/extended_states for APT</li>
+<li>/var/lib/aptitude/pkgstates for aptitude only</li>
+</ul></li>
+<li>dpkg
+<ul>
+<li>/var/lib/dpkg/info/<package_name>.conffiles list of configuration files. (user modifiable)</li>
+<li>/var/lib/dpkg/info/<package_name>.list list of files and directories installed by the package</li>
+<li>/var/lib/dpkg/info/<package_name>.md5sums list of MD5 hash values for files installed by the package</li>
+<li>/var/lib/dpkg/info/<package_name>.preinst package script to be run before the package installation</li>
+<li>/var/lib/dpkg/info/<package_name>.postinst package script to be run after the package installation</li>
+<li>/var/lib/dpkg/info/<package_name>.prerm package script to be run before the package removal</li>
+<li>/var/lib/dpkg/info/<package_name>.postrm package script to be run after the package removal</li>
+<li>/var/lib/dpkg/info/<package_name>.config package script for debconf system</li>
+<li>/var/lib/dpkg/alternatives/<package_name> the alternative information used by the update-alternatives command</li>
+<li>/var/lib/dpkg/available the availability information for all the package</li>
+<li>/var/lib/dpkg/diversions the diversions information used by dpkg(1) and set by dpkg-divert(8)</li>
+<li>/var/lib/dpkg/statoverride the stat override information used by dpkg(1) and set by dpkg-statoverride(8)</li>
+<li>/var/lib/dpkg/status the status information for all the packages</li>
+<li>/var/lib/dpkg/status-old the first-generation backup of the “var/lib/dpkg/status” file</li>
+<li>/var/backups/dpkg.status* the second-generation backup and older ones of the “var/lib/dpkg/status” file</li>
+</ul></li>
+<li>update-alternatives(8)</li>
+<li>Tweaking candidate version
+<ul>
+<li>When you install packages from mixed source of archives (see Section 2.7.2, “Packages from mixed source of archives”) regularly, you can automate these complicated operations by creating the “/etc/apt/preferences” file with proper entries and tweaking the package selection rule for candidate version as described in apt_preferences(5). This is called apt-pinning.</li>
+</ul></li>
+</ul>
+<h1 id="the-system-initialization-skipped-because-of-the-systemd-update">The system initialization (skipped because of the systemd update)</h1>
+<h1 id="authentication-skipped">Authentication (skipped)</h1>
+<h1 id="network-setup-skipped">Network setup (skipped)</h1>
+<h1 id="network-applications-skipped">Network applications (skipped)</h1>
+<h1 id="the-x-window-system">The X Window System</h1>
+<ul>
+<li>Debian menu system under /usr/share/menu</li>
+<li>Freedesktop.org menu system under /usr/share/applications</li>
+<li>the starting process of X is rather complicated, described in section 7.5 at https://www.debian.org/doc/manuals/debian-reference/ch07.en.html</li>
+<li>fonts</li>
+<li>xmodmap(1) is a utility for modifying keymaps and pointer button mappings in the X Window System</li>
+<li>To get the keycode, run xev(1) in the X and press keys</li>
+<li><code>xrdb -merge ~/.Xresources</code></li>
+</ul>
+<h1 id="i18n-and-l10n-skipped">I18N and L10N (skipped)</h1>
+<h1 id="system-tips">System tips</h1>
+<ul>
+<li>script(1)</li>
+<li>lsof</li>
+<li>strace</li>
+<li>ltrace</li>
+<li>xtrace</li>
+<li>fuser</li>
+<li>watch</li>
+<li>at(1)</li>
+<li>Alt-SysRq</li>
+<li>lspci -nn</li>
+<li>alsa-utils (package)</li>
+<li>grep ‘] Memory’ /var/log/dmesg</li>
+<li>free -k</li>
+<li>debsums</li>
+<li>parted(8)</li>
+<li>mkfs(8)</li>
+<li>/etc/fstab</li>
+<li>SSD optimization</li>
+<li>smartd(8)</li>
+<li>mount –bind</li>
+<li>chroot(8)</li>
+</ul>
+<h1 id="data-management-skipped">Data management (skipped)</h1>
+<h1 id="data-conversion-skipped">Data conversion (skipped)</h1>
+<h1 id="programming">Programming</h1>
+<ul>
+<li>“12.1.5. The shell command-line processing sequence” has an excellent description of shell quoting rules</li>
+<li>Use ldd(1) to find out a program’s dependency on libraries</li>
+<li>12.11. Making Debian package</li>
+</ul>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
