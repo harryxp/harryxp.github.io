@@ -4,6 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>Peachful Space - A Monadic Way to Compute Power Set</title>
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
     </head>
     <body>
@@ -36,7 +37,7 @@ powerSet =  filterM (\_ -&gt; [True,False])</code></pre>
 <p>Seriously, what the heck in the world is this?! It took me a while to figure out and this process completely led me away from what I was doing. It’s really just taking all the pieces and fitting them together. So let’s get started, shall we?</p>
 <p>The first thing to recall is the good old <code>filter</code> functoin.</p>
 <pre><code>filter :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></pre>
-<p>So how is <code>filterM</code> different?</p>
+<p><code>filterM</code> also works on a list, so how is it different?</p>
 <pre><code>filterM          :: (Monad m) =&gt; (a -&gt; m Bool) -&gt; [a] -&gt; m [a]
 filterM _ []     =  return []
 filterM p (x:xs) =  do
@@ -65,8 +66,7 @@ filterM p (x:xs) =  do
       (\flg -&gt;
         filterM (\_ -&gt; [True,False]) xs   &gt;&gt;= \ys  -&gt;
         return (if flg then x:ys else ys))
-      [True,False]
-    )</code></pre>
+      [True,False])</code></pre>
 <p>So ultimately it does this:</p>
 <ol style="list-style-type: decimal">
 <li>Take the head <code>x</code> of the list <code>(x:xs)</code>, prepare a <code>[True,False]</code> for it.</li>
