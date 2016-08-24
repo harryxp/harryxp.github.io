@@ -29,17 +29,23 @@
 
 <p>I’m writing this because I had to do a terrible hack to make it work…</p>
 <p>This happens on 20160823, on an up-to-date Arch Linux machine.</p>
-<pre><code># install node.js and alex using pacman
-$ pacman -S nodejs alex
+<pre><code># install stack, haskell-stack, node.js and alex using pacman
+$ sudo pacman -S stack haskell-stack nodejs alex
 
-$ git clone https://github.com/ghcjs/ghcjs.git
+$ cd &amp;&amp; git clone https://github.com/ghcjs/ghcjs.git
 
 # if you `stack setup` now you'll get an error saying /usr/lib/libtinfo.so.5 cannot be found
 
-# install AUR libtinfo... (google it)
+# install libtinfo from AUR
+$ cd ~/build-aur
+$ git clone https://aur.archlinux.org/libtinfo.git
+$ cd libtinfo
+$ makepkg -sri
+
 # introducing the terrible hack...  I know, but it's the only way I can make it work
 $ sudo ln -s /usr/lib/libtinfo.so /usr/lib/libtinfo.so.5
 
+$ cd ~/ghcjs
 $ stack setup
 $ stack build
 $ stack exec -- ghcjs-boot --dev
