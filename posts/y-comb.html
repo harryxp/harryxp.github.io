@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Peachful Space - The Y Combinator</title>
+        <title>Peachful Space - The Y Combinator, with Real Code</title>
         <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
     </head>
@@ -20,13 +20,15 @@
         </div>
 
         <div id="content">
-            <h1>The Y Combinator</h1>
+            <h1>The Y Combinator, with Real Code</h1>
 
             <div class="info">
     Posted on October 11, 2016
     
 </div>
 
+<p>I was puzzled by the Y combinator for a long time, partly because it’s hard to find real code demonstrating it. Therefore I wrote this note.</p>
+<p><a href="https://github.com/harryxp/haskell-things/blob/master/misc/ycomb.hs">Haskell implementation</a> <a href="https://github.com/harryxp/haskell-things/blob/master/misc/ycomb.py">Python implementation</a></p>
 <h2 id="introducing-y">Introducing Y</h2>
 <p>A fixed point of a function <code>f</code> is a value <code>g</code> such that <code>f g = g</code>:</p>
 <pre><code>g = f g = f (f g) = f (f (f g)) = ...</code></pre>
@@ -55,13 +57,12 @@ Y f = f (Y f) = f (f (Y f)) = ...</code></pre>
 <p>Let’s see how it works in a real programming language, rather than the abstract λ-calculus. Haskell’s Hindley-Milner type system can’t type check this, because the type of <code>x</code> in <code>(x x)</code> is recursive. How? Well, the first <code>x</code> here suggests that <code>x</code> is of type <code>a -&gt; b</code> where <code>a</code> is the type of the second <code>x</code>. But <code>x</code>’s type can’t be both <code>a -&gt; b</code> and <code>a</code>. So this becomes a little ugly but still workable:</p>
 <pre><code>import Unsafe.Coerce (unsafeCoerce)
 
-y = \f -&gt; (\x -&gt; f (unsafeCoerce x x)) (\x -&gt; f (unsafeCoerce x x))</code></pre>
+y f = (\x -&gt; f (unsafeCoerce x x)) (\x -&gt; f (unsafeCoerce x x))</code></pre>
 <p>Now we’re ready to play with it to consolidate our intuition. One of the most useful things a fixed-point combinantor can do is to implement recursion without language support - this can be observed by the fact that the structure of <code>Y</code> repeats <code>F</code>. So naturally <code>F</code> should capture the calculation to be repeated. In that sense, <code>Y</code> is a <em>much</em> glorified loop. Assuming we want to calculate factorial, we can write <code>F</code> as</p>
 <pre><code>c g = \n -&gt; if n == 0 then 1 else n * g (n - 1)</code></pre>
 <p>So how to come up with this? Remember again <code>c</code> is supposed to capture the calculation to be repeated, whereas <code>y</code> captures the repeating part. <code>y c</code> will return the fixed point of <code>c</code>. If we believe that <code>Y F = F (Y F)</code>, then at some point we shall see <code>y c = c (y c)</code>, hence <code>g</code> accepted by <code>c</code> should be <code>y c</code> which is the fixed point. <code>c</code> is also required to kick off the next calculation using the fixed point.</p>
 <p>Now look at how <code>y c 3</code> yields 6 informally,</p>
 <pre><code>   y c 3                                                        -- interestingly, y only appears this one time, but its essense will be carried on in g
-=&gt; (\f -&gt; (\x -&gt; f (x x)) (\x -&gt; f (x x))) c 3
 =&gt; (\x -&gt; c (x x)) (\x -&gt; c (x x)) 3                            -- g 3; y c yields g, which is (\x -&gt; c (x x)) (\x -&gt; c (x x))
 =&gt; c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 3                        -- c g 3; g yields c g; remember Haskell is lazy - we apply c now
 =&gt; (\n -&gt; if n == 0 then 1 else n *                             -- c 3; the fixed point is working here: c g =&gt; c; c contains g and will kick off the next round
