@@ -108,6 +108,20 @@ def c(g):
     return (lambda n: 1 if n == 0 else (n * g(n - 1)))
 
 print(z(c)(3))</code></pre>
+<h2 id="a-much-simpler-fixed-point-combinator">A much simpler fixed-point combinator</h2>
+<p>Remember we’ve said that the Y combinator is just <em>one</em> fixed-point combinator? There are more of them. In fact in a lazy language like Haskell it’s very easy to define one:</p>
+<pre><code>fix f = f (fix f)</code></pre>
+<p>And it can be used to do recursion as well:</p>
+<pre><code>   fix c 3                                                  -- fix c 3
+=&gt; c (fix c) 3                                              -- g 3
+=&gt; (\n -&gt; if n == 0 then 1 else n * (fix c) (n - 1)) 3      -- c 3; fixed point at work!
+
+=&gt; 3 * (fix c) 2                                            -- 3 * fix c 2
+=&gt; 3 * c (fix c) 2                                          -- 3 * g 2
+
+=&gt; 3 * (\n -&gt; if n == 0 then 1 else n * (fix c) (n - 1)) 2  -- 3 * c 2
+=&gt; ...</code></pre>
+<p>So … why did we start with a much more complicated Y combinator then? Because that’s the canonical λ-calculus version that puzzled me for a long time. In λ-calculus you can’t give names to functions so you can’t make them refer to themselves, like <code>fix</code> does. Naming matters a lot!</p>
 
         </div>
         <div id="footer">
