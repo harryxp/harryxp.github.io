@@ -27,12 +27,15 @@
     
 </div>
 
+<h2 id="introducing-y">Introducing Y</h2>
 <p>A fixed point of a function <code>f</code> is a value <code>g</code> such that <code>f g = g</code>:</p>
 <pre><code>g = f g = f (f g) = f (f (f g)) = ...</code></pre>
-<p>The Y combinator is a fixed-point combinator. It is a high-order function that produces a fixed point <code>g</code> for a given function <code>f</code>:</p>
-<pre><code>g = y f
-y f = f (y f) = f (f (y f)) = ...</code></pre>
-<p>One call-by-name Y combinator represented in lambda calculus is:</p>
+<p>That is, you feed <code>g</code> back into <code>f</code> you still get <code>g</code>.</p>
+<p>The Y combinator is such a fixed-point combinator. It is a high-order function that produces a fixed point <code>g</code> for a given function <code>f</code>:</p>
+<pre><code>g = Y f
+Y f = f (Y f) = f (f (Y f)) = ...</code></pre>
+<p>(We are not being accurate regarding the evaluation strategy used here. This is more about showing the recurring nature of the expression.)</p>
+<p>One call-by-name version of Y combinator represented in λ-calculus is:</p>
 <pre><code>Y = λf. (λx. f (x x)) (λx. f (x x))</code></pre>
 <p>Call-by-name is an evaluation strategy where</p>
 <ol style="list-style-type: decimal">
@@ -40,26 +43,71 @@ y f = f (y f) = f (f (y f)) = ...</code></pre>
 <li>No reductions are allowed inside abstractions.</li>
 </ol>
 <p>A reducible expression is just a function application.</p>
-<p>So let’s compute what Y F is:</p>
-<pre><code>Y F
+<p>So let’s compute what <code>Y F</code> is:</p>
+<pre><code>  Y F
 = (λf. (λx. f (x x)) (λx. f (x x))) F           -- β-reduction on λf
 = (λx. F (x x)) (λx. F (x x))                   -- β-reduction on first λx
 = F ((λx. F (x x)) (λx. F (x x)))</code></pre>
-<p>But the last one is just <code>F (Y F)</code>!</p>
-<p>Now here’s the call-by-value version, called the Z combinantor:</p>
+<p>The last one is just <code>F (Y F)</code>!</p>
+<p>Note that using call-by-name, the next step would be β-reduction on <code>F</code>. Here we are just rewriting it to show it’s actually <code>F (Y F)</code>. However if we are using call-by-value, the <code>((λx. F (x x)) (λx. F (x x)))</code> part will be evaluated first hence it’ll go on forever! We’ll come back to this later.</p>
+<h2 id="intuition-is-my-favorite-part">Intuition is my favorite part</h2>
+<p>This is all great. But let’s develop some intuition of it. <code>(λx. f (x x))</code> appears twice in <code>Y</code>, and <code>f</code> is just whatever passed to <code>Y</code>. Once we are done with β-reduction on <code>λf</code>, we are only looking at <code>(λx. F (x x)) (λx. F (x x))</code>. <em>THIS IS THE FIXED POINT!</em> This funny expression is the crux of the whole idea - further β-reductions of the fixed point yield <em>almost</em> itself, but with applications of <code>F</code> on the left. It almost makes sense: the leftmost <code>(x x)</code> serves as the placeholder for the second <code>(λx. F (x x))</code> when β-reduction happens, and after it’s done it looks the same except for the <code>F</code> on the left side.</p>
+<p>Let’s see how it works in a real programming language, rather than the abstract λ-calculus. Haskell’s Hindley-Milner type system can’t type check this, because the type of <code>x</code> in <code>(x x)</code> is recursive. How? Well, the first <code>x</code> here suggests that <code>x</code> is of type <code>a -&gt; b</code> where <code>a</code> is the type of the second <code>x</code>. But <code>x</code>’s type can’t be both <code>a -&gt; b</code> and <code>a</code>. So this becomes a little ugly but still workable:</p>
+<pre><code>import Unsafe.Coerce (unsafeCoerce)
+
+y = \f -&gt; (\x -&gt; f (unsafeCoerce x x)) (\x -&gt; f (unsafeCoerce x x))</code></pre>
+<p>Now we’re ready to play with it to consolidate our intuition. One of the most useful things a fixed-point combinantor can do is to implement recursion without language support - this can be observed by the fact that the structure of <code>Y</code> repeats <code>F</code>. So naturally <code>F</code> should capture the calculation to be repeated. In that sense, <code>Y</code> is a <em>much</em> glorified loop. Assuming we want to calculate factorial, we can write <code>F</code> as</p>
+<pre><code>c g = \n -&gt; if n == 0 then 1 else n * g (n - 1)</code></pre>
+<p>So how to come up with this? Remember again <code>c</code> is supposed to capture the calculation to be repeated, whereas <code>y</code> captures the repeating part. <code>y c</code> will return the fixed point of <code>c</code>. If we believe that <code>Y F = F (Y F)</code>, then at some point we shall see <code>y c = c (y c)</code>, hence <code>g</code> accepted by <code>c</code> should be <code>y c</code> which is the fixed point. <code>c</code> is also required to kick off the next calculation using the fixed point.</p>
+<p>Now look at how <code>y c 3</code> yields 6 informally,</p>
+<pre><code>   y c 3                                                        -- interestingly, y only appears this one time, but its essense will be carried on in g
+=&gt; (\f -&gt; (\x -&gt; f (x x)) (\x -&gt; f (x x))) c 3
+=&gt; (\x -&gt; c (x x)) (\x -&gt; c (x x)) 3                            -- g 3; y c yields g, which is (\x -&gt; c (x x)) (\x -&gt; c (x x))
+=&gt; c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 3                        -- c g 3; g yields c g; remember Haskell is lazy - we apply c now
+=&gt; (\n -&gt; if n == 0 then 1 else n *                             -- c 3; the fixed point is working here: c g =&gt; c; c contains g and will kick off the next round
+     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 3
+
+=&gt; 3 * ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 2                      -- 3 * g 2
+=&gt; 3 * c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 2                    -- 3 * c g 2
+=&gt; 3 * (\n -&gt; if n == 0 then 1 else n *                         -- 3 * c 2
+     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 2
+
+=&gt; 3 * (2 * ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 1)                -- 3 * (2 * g 1)
+=&gt; 3 * (2 * c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 1)              -- 3 * (2 * c g 1)
+=&gt; 3 * (2 * (\n -&gt; if n == 0 then 1 else n *                    -- 3 * (2 * c 1)
+     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 1)
+
+=&gt; 3 * (2 * (1 * (((\x -&gt; c (x x)) (\x -&gt; c (x x))) 0)))        -- 3 * (2 * (1 * g 0))
+=&gt; 3 * (2 * (1 * ((c ((\x -&gt; c (x x)) (\x -&gt; c (x x)))) 0)))    -- 3 * (2 * (1 * c g 0))
+=&gt; 3 * (2 * (1 * ((\n -&gt; if n == 0 then 1 else n *              -- 3 * (2 * (1 * c 0))
+     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 0))
+=&gt; 3 * (2 * (1 * (1)))                                          -- 3 * (2 * (1 * 1))
+=&gt; 6</code></pre>
+<p>Think hard on the general pattern of <code>g =&gt; c g =&gt; c =&gt; g</code>!</p>
+<h2 id="the-call-by-value-variant">The call-by-value variant</h2>
+<p>In the first section we talked about call-by-value, which is what the majority of programming languages employ. Now here’s the call-by-value version, called the Z combinantor:</p>
 <pre><code>Z = λf. (λx. f (λy. x x y)) (λx. f (λy. x x y))</code></pre>
+<p>Notice the difference between <code>(x x)</code> and <code>(λy. x x y)</code>? That’s it. The earlier is just the point-free version of the latter! The extra <code>λy</code> allows us the delay the evaluation of <code>(x x)</code>.</p>
 <p>And the rules for call-by-value are:</p>
 <ol style="list-style-type: decimal">
 <li>Only outermost reducible expressions are reduced.</li>
 <li>A reducible expression is reduced only when its right-hand side (arguments) has already been reduced to a value.</li>
 </ol>
-<p>It’s a little trickier to expand:</p>
-<pre><code>Z F
+<p>Again in λ-calculus:</p>
+<pre><code>  Z F
 = (λf. (λx. f (λy. x x y)) (λx. f (λy. x x y))) F       -- β-reduction on λf
 = (λx. F (λy. x x y)) (λx. F (λy. x x y))               -- β-reduction on first λx
 = F (λy. (λx. F (λy. x x y)) (λx. F (λy. x x y)) y)     -- rewrite (λx. F (λy. x x y)) (λx. F (λy. x x y))
-= F (λy. (Z F) y)                                       -- η-conversion
+= F (λy. (Z F) y)                                       -- η-conversion on λy
 = F (Z F)</code></pre>
+<p>Again we implement it in a real programming language - Python:</p>
+<pre><code>def z(f):
+    return (lambda x: f (lambda y: x(x)(y))) (lambda x: f (lambda y: x(x)(y)))
+
+def c(g):
+    return (lambda n: 1 if n == 0 else (n * g(n - 1)))
+
+print(z(c)(3))</code></pre>
 
         </div>
         <div id="footer">
