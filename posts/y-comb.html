@@ -28,7 +28,10 @@
 </div>
 
 <p>I was puzzled by the Y combinator for a long time, partly because it’s hard to find real code demonstrating it. Therefore I wrote this note.</p>
-<p><a href="https://github.com/harryxp/haskell-things/blob/master/misc/ycomb.hs">Haskell implementation</a> <a href="https://github.com/harryxp/haskell-things/blob/master/misc/ycomb.py">Python implementation</a></p>
+<ul>
+<li><a href="https://github.com/harryxp/haskell-things/blob/master/misc/ycomb.hs">Haskell implementation</a></li>
+<li><a href="https://github.com/harryxp/haskell-things/blob/master/misc/ycomb.py">Python implementation</a></li>
+</ul>
 <h2 id="introducing-y">Introducing Y</h2>
 <p>A fixed point of a function <code>f</code> is a value <code>g</code> such that <code>f g = g</code>:</p>
 <pre><code>g = f g = f (f g) = f (f (f g)) = ...</code></pre>

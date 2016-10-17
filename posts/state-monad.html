@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Peachful Space - State Monad</title>
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Peachful Space</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>State Monad</h1>
+
+            <div class="info">
+    Posted on January 28, 2016
+    
+</div>
+
+<p>Consider a plain recursive solution to calculating factorial in Haskell:</p>
+<pre><code>fac :: Int -&gt; Int
+fac 1 = 1
+fac n = n * fac (n - 1)</code></pre>
+<p>This way, the state of computation is kept in the call stack. By state I mean “everything that needs to be kept to continue the computation”. So each call definitely needs <code>n</code>, plus the return address stored in the stack frame so the control flow later knows about the multiplication.</p>
+<p>Now consider a non-recursive solution with explicit state. Of course we can pass around the state explicitly like this:</p>
+<pre><code>fac :: Int -&gt; Int
+fac n = fac' n 1
+
+fac' :: Int -&gt; Int -&gt; Int
+fac' 1 accum = accum
+fac' n accum = fac' (n - 1) (n * accum)</code></pre>
+<p>Here, each call has ALL the information it needs to continue the computation. The compiler could apply the tail recursion optimization, making it effectively a loop.</p>
+<p>We have yet another way even more akin to “loops” in imperative programming languages. Suppose each <code>fac</code> call now returns the state, including the result (which might be incomplete/partial) and the parameter needed for the computation to go on:</p>
+<pre><code>fac_step :: (Int, Int) -&gt; (Int, Int)
+fac_step (n, accum) = (n - 1, n * accum)</code></pre>
+<p>Now we can use this in ghci:</p>
+<pre><code>Prelude&gt; fac_step (4,1)       -- fac 4 with accum = 1
+(3,4)
+Prelude&gt; fac_step (3,4)       -- fac 3 with accum = 4
+(2,12)
+Prelude&gt; fac_step (2,12)      -- fac 2 with accum = 12
+(1,24)                        -- we get the answer when we hit 1</code></pre>
+<p>It feels like we are just turning the crank. We can do something like:</p>
+<pre><code>Prelude&gt; snd $ until ((==1) . fst) fac_step (4,1)
+24</code></pre>
+<p>This is a common enough pattern that there’s a monad for it. The <em>Introducing State</em> section of <a href="https://en.wikibooks.org/wiki/Haskell/Understanding_monads/State">this wikibooks page</a> does a good job describing it. Essentially:</p>
+<ol style="list-style-type: decimal">
+<li>The purpose is to compose/bind a series of computations together. Each computation takes some state, produces some result plus some new state.</li>
+<li>The <code>State</code> monad is a wrapper of a function called <code>runState</code>, thus it’s more or less equivalent to this function. The name <code>State</code> is a bit of a misnomer.</li>
+<li>The field <code>runState :: s -&gt; (a, s)</code> also acts as the accessor of a <code>State</code> record. That is, it can be seen as a function that takes a value of type <code>State</code> and returns a value of type <code>s -&gt; (a, s)</code>. We can call this the <em>state processor</em>.</li>
+<li><code>state :: (s -&gt; (a, s)) -&gt; State s a</code> can be used to construct a <code>State</code>.</li>
+<li><p><code>return</code> calls <code>state</code>:</p>
+<pre><code>instance Monad (State s) where
+    return :: a -&gt; State s a
+    return x = state ( \st -&gt; (x, st) )</code></pre></li>
+<li><p>The most important part is always how <code>bind</code> works:</p>
+<pre><code>instance Monad (State s) where
+    (&gt;&gt;=) :: State s a -&gt; (a -&gt; State s b) -&gt; State s b
+    pr &gt;&gt;= k = state $ \st -&gt;
+       let (x, st') = runState pr st    -- Running the first processor on st.
+          in runState (k x) st'         -- Running the second processor on st'.</code></pre></li>
+</ol>
+<p>Another working example demonstrating the State monad:</p>
+<pre><code>import Control.Monad              (return)
+import Control.Monad.Trans.State  (State,evalState,state)
+import System.Random              (StdGen,mkStdGen,randomR)
+
+rollDie :: State StdGen Int
+rollDie = state $ randomR (1,6)
+
+chainedRolling :: State StdGen (Int,Int,Int)
+chainedRolling =
+  rollDie &gt;&gt;= \d1 -&gt;
+  rollDie &gt;&gt;= \d2 -&gt;
+  rollDie &gt;&gt;= \d3 -&gt;
+  return (d1,d2,d3)
+
+result :: (Int,Int,Int)
+result = evalState chainedRolling $ mkStdGen 777</code></pre>
+<p>References:</p>
+<ul>
+<li><a href>https://wiki.haskell.org/State_Monad</a></li>
+<li><a href>http://learnyouahaskell.com/for-a-few-monads-more</a></li>
+<li><a href>http://brandon.si/code/the-state-monad-a-tutorial-for-the-confused/</a></li>
+<li><a href>https://hackage.haskell.org/package/transformers-0.5.2.0/docs/Control-Monad-Trans-State-Lazy.html</a></li>
+<li><a href>https://hackage.haskell.org/package/transformers-0.5.2.0/docs/src/Control-Monad-Trans-State-Lazy.html</a></li>
+</ul>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
