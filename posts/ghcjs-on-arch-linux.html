@@ -23,12 +23,34 @@
             <h1>ghcjs on Arch Linux</h1>
 
             <div class="info">
-    Posted on August 23, 2016
+    Posted on February 28, 2017
     
 </div>
 
-<p>I’m writing this because I had to do a terrible hack to make it work…</p>
-<p>This happens on 20160823, on an up-to-date Arch Linux machine.</p>
+<p>So far I’ve tried two ways to use <code>ghcjs</code>:</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>ghcjs</code> as the compiler for a <code>stack</code> project. The setup takes a long time but what you’ll get is decent.
+<ul>
+<li>A minimal example can be found <a href="https://github.com/harryxp/ghcjs-playground">here</a>. It uses the basic <code>ghcjs-dom</code> library to demonstrate:
+<ul>
+<li>How to create an HTML element dynamically.</li>
+<li>How to attach an event listener.</li>
+<li>How to retrieve value from a text field.</li>
+</ul></li>
+<li>A more sophisticated example that calculates mortgage payment can be found <a href="https://github.com/harryxp/MortgageCalc">here</a>.
+<ul>
+<li>See the <a href="https://cdn.rawgit.com/harryxp/MortgageCalc/master/web/dist/index.html">compiled page</a>. Courtesy of <a href="http://rawgit.com/">RawGit</a>.</li>
+</ul></li>
+</ul></li>
+<li>Use <code>stack</code> to build <code>ghcjs</code> from its git repo and ran <code>ghcjs</code> as any Haskell program.
+<ul>
+<li>I only tried this with the most trivial programs. I’m still keeping the notes below.</li>
+</ul></li>
+</ol>
+<hr />
+<p>This section contains the outdated notes from 20160823. It describes how to build <code>ghcjs</code> and use it to compile a <code>Hello World!</code> Haskell program into JavaScript.</p>
+<p>I had to do a terrible hack to make it work…</p>
+<p>This happened on a then-up-to-date Arch Linux machine.</p>
 <pre><code># install stack, haskell-stack, node.js and alex using pacman
 $ sudo pacman -S stack haskell-stack nodejs alex
 
