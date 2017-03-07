@@ -88,10 +88,10 @@ group by
 |           2/1/2017 |             1 |      Bob |           150 |              0 |
 |           2/1/2017 |             2 |      Bob |           160 |              0 |</code></pre>
 <p>. It’s the same information as that pivot table, but the <code>group by</code> keys are still part of the data, whereas in the pivot table they serve as metadata.</p>
-<p>One may also contemplate an <code>unpivot</code> operation that goes the other direction. You then need to come up with a <code>disperse</code> function to undo the aggregated data like <code>110+120</code>.</p>
+<p>One may also contemplate an <code>unpivot</code> operation that goes the other direction. You then need to come up with what we might call a <code>segregate</code> function to undo the aggregated data like <code>110+120</code>.</p>
 <h2 id="insight">Insight</h2>
 <p>The reason why I wrote this is that I get confused when data becomes metadata during processing in certain softwares (like Excel). As a programmer, it’s comforting to know how they are equivalent to <code>SQL</code> operations.</p>
-<p>This is actually useful. Let’s take an example from another software system - <code>R</code>. The <code>reshape</code> package in <code>R</code> has a <code>melt</code> function.</p>
+<p>This is actually useful. Let’s take an example from another software system - <code>R</code>. The <code>reshape2</code> package in <code>R</code> has a <code>melt</code> function.</p>
 <pre><code>data1
 
 |  id | time |  x1 |  x2 |
