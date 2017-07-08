@@ -1,0 +1,114 @@
+digraph {
+    label="Monad-Related Type Classes in PureScript"
+    rankdir=BT
+    style=invis
+    node [fontname = "Monaco"];
+
+    subgraph cluster_legend {
+        label="Legend"
+        node [shape=record]
+
+        Legend[label="{ Type Class
+                      | Summary
+                      | Methods
+                      | Laws
+                      }"
+               color="red"
+              ]
+    }
+
+    subgraph cluster_monoid {
+        label="Monoid"
+        node [shape=record]
+
+        Semigroup[label="{ Semigroup a
+                         | Supports an append operation\n
+                           to combine two values.
+                         | append (\<\>) :: a -\> a -\> a
+                         | Associativity Law: (x \<\> y) \<\> z = x \<\> (y \<\> z)
+                         }"
+                 ]
+        Monoid   [label="{ Monoid m
+                         | Semigroups with an identity value w.r.t \<\>.
+                         | mempty :: m
+                         | Right-Identity Law: m \<\> mempty = m\n
+                           Left-Identity Law: mempty \<\> m = m\n
+                         }"
+                 ]
+
+        Monoid -> Semigroup
+    }
+
+    subgraph cluster_monad {
+        label="Monad"
+        node [shape=record]
+
+        Functor    [label="{ Functor f
+                           | Applying a function to a value in a context (without altering the context).
+                           | map (\<$\>) :: (a -\> b) -\> f a -\> f b
+                           | Identity Law: id \<$\> xs = xs\n
+                             Composition Law: g \<$\> (f \<$\> xs) = (g \<\<\< f) \<$\> xs
+                           }"
+                   ]
+        Apply      [label="{ Apply f
+                           | Like Functor but first argument to `apply`\n
+                             is wrapped in the type constructor `f`.
+                           | apply (\<*\>) :: f (a -\> b) -\> f a -\> f b
+                           |
+                           }"
+                   ]
+        Applicative[label="{ Applicative f
+                           | Allows us to work in larger \"programming languages\" which\n
+                             support some sort of side-effect encoded by the functor `f`.
+                           | pure :: a -\> f a
+                           | Identity Law: pure id \<*\> v = v\n
+                             Homomorphism: pure f \<*\> pure x = pure (f x)\n
+                             Interchange Law: u \<*\> pure y = pure ($ y) \<*\> u\n
+                             Composition Law: u \<*\> (v \<*\> w) = pure (.) \<*\> u \<*\> v \<*\> w\n
+                             Relation to Functor: g \<$\> x = pure g \<*\> x
+                           }"
+                   ]
+        Bind       [label="{ Bind m
+                           |
+                           | bind (\>\>=) :: m a -\> (a -\> m b) -\> m b
+                           |
+                           }"
+                   ]
+        Monad      [label="{ Monad m
+                           | Applicative functors only allow us to lift function arguments\n
+                             which are independent of each other, but monads allow us to\n
+                             write computations which involve more interesting data dependencies.
+                           |
+                           | Right-Identity Law: m \>\>= pure = m\n
+                             Left-Identity Law: pure a \>\>= f = f a\n
+                             Associativity Law: (m \>\>= f) \>\>= g = m \>\>= (\x \>\>= f x \>\>= g)
+                           }"
+                   ]
+
+        Foldable   [label="{ Foldable f
+                           | Containers which can be \"folded\" into a summary value.
+                           | foldr :: (a -\> b -\> b) -\> b -\> f a -\> b\n
+                             foldl :: (b -\> a -\> b) -\> b -\> f a -\> b\n
+                             foldMap :: Monoid m =\> (a -\> m) -\> f a -\> m
+                           |
+                           }"
+                   ]
+        Traversable[label="{ Traversable t
+                           | Provides the ability to combine a collection of side-effects\n
+                             which depend on its structure.
+                           | traverse :: Applicative m =\> (a -\> m b) -\> t a -\> m (t b)\n
+                             sequence :: Applicative m =\> t (m a) -\> m (t a)
+                           | TODO
+                           }"
+                   ]
+
+        Apply -> Functor
+        Applicative -> Apply
+        Bind -> Apply
+        Monad -> Bind
+        Monad -> Applicative
+
+        Traversable -> Foldable
+        Traversable -> Functor
+    }
+}

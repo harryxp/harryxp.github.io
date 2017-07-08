@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Peachful Space - Functor, Applicative and Monad</title>
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Peachful Space</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Functor, Applicative and Monad</h1>
+
+            <div class="info">
+    Posted on July  8, 2017
+    
+</div>
+
+<p>It’s useful to compare three related abstractions of computation provided by PureScript and Haskell.</p>
+<p><img src="../images/monad-related-type-classes-purescript.png" alt="Monad-Related Type Classes in PureScript" />.</p>
+<p>The idea of composition is essential in functional programming. Composition is <em>THE</em> way we build large programs from small. At the most basic level we have function composition. But <code>Functor</code>, <code>Applicative</code> and <code>Monad</code> go further, while sharing the same powerful core idea of composition (or combining things), they work on computations with <em>context</em>.</p>
+<h2 id="function-composition">Function Composition</h2>
+<p>Plain function composition in Haskell is straightforward:</p>
+<pre><code>&gt; ((2*) . (1+)) 42
+86</code></pre>
+<h2 id="functor">Functor</h2>
+<p><code>Functor</code> introduces the notion of <em>context</em>. What does that even mean? Values in a <em>context</em> means values are somewhat <em>amplified</em>. For example instead of <code>Int</code> values, a <code>Functor</code> can be <code>Maybe Int</code>, which amplifies the <code>Int</code> type with the possibility of a <code>Nothing</code> value:</p>
+<pre><code>&gt; :t (&lt;$&gt;)
+(&lt;$&gt;) :: Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+
+&gt; (2*) &lt;$&gt; (1+) &lt;$&gt; (Just 42)
+Just 86
+
+&gt; (2*) &lt;$&gt; (1+) &lt;$&gt; Nothing
+Nothing</code></pre>
+<p>Or list of <code>Int</code>s, which allows multiple or zero values:</p>
+<pre><code>&gt; (2*) &lt;$&gt; (1+) &lt;$&gt; [42, 43]
+[86, 88]
+
+&gt; (2*) &lt;$&gt; (1+) &lt;$&gt; []
+[]</code></pre>
+<p>Or even <code>IO</code>, which is also a <code>Functor</code> allowing IO side-effects:</p>
+<pre><code>&gt; (++&quot; is good&quot;) &lt;$&gt; (++&quot;urity&quot;) &lt;$&gt; getLine
+p&lt;ENTER&gt;
+&quot;purity is good&quot;</code></pre>
+<p><code>&lt;$&gt;</code>, defined as an <code>infixl</code>, is an alias of <code>fmap</code> in Haskell and <code>map</code> in PureScript.</p>
+<p>A function is also a <code>Functor</code> and <code>&lt;$&gt;</code> in that case is just function composition. In <code>f &lt;$&gt; g</code>, instead of providing a value to <code>f</code>, <code>g</code> provides another function in front of <code>f</code>! That’s why the first <code>&lt;$&gt;</code>s work in the above expressions.</p>
+<p>Intuitively <code>&lt;$&gt;</code> can be described as <em>“lifting”</em> a “plain” function into a context so it can work on the value in that context. This is more obvious with the second <code>&lt;$&gt;</code>s above. More interestingly, note that <code>&lt;$&gt;</code> can make certain decisions - if you look at the implementation of the <code>Maybe</code> functor you’ll discover that when the value is <code>Nothing</code>, <code>&lt;$&gt;</code> doesn’t use its left argument (the function) at all. In other words, <em>it can make decisions according to the context</em>. This is an important point we’ll see again later.</p>
+<h2 id="applicative">Applicative</h2>
+<p><code>&lt;$&gt;</code> is all very well but sometimes not only the value can be in a context, but also the function. What can we do with a <code>Just (1+)</code> and a <code>Just 42</code>? You may think that this is a contrived example but it naturally occurs when working with functions with multiple arguments:</p>
+<pre><code>&gt; (+) &lt;$&gt; (Just 1)</code></pre>
+<p>What we get from this is effectively <code>Just (1+)</code> but <code>ghci</code> doesn’t know how to print it. Now we simply have some functions in the context of <code>Maybe</code>!</p>
+<p><code>Applicative</code> comes to rescue with <code>&lt;*&gt;</code>:</p>
+<pre><code>&gt; :t (&lt;*&gt;)
+(&lt;*&gt;) :: Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+
+&gt; (+) &lt;$&gt; (Just 1) &lt;*&gt; (Just 2)
+Just 3</code></pre>
+<p>Given n &gt; 1, when we use <code>&lt;$&gt;</code> to apply function of arity n to a value in a context, due to currying, what we get is a function of arity n - 1 in the context. It can be seen from the type of <code>&lt;$&gt;</code>.</p>
+<pre><code>(&lt;$&gt;) :: Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b</code></pre>
+<p>by replacing type variable <code>b</code> with a function type.</p>
+<pre><code>(&lt;$&gt;) :: Functor f =&gt; (a -&gt; b -&gt; c) -&gt; f a -&gt; f (b -&gt; c)</code></pre>
+<p>The return value <code>f (b -&gt; c)</code> is clearly a function in the context, and that fits the argument type of <code>&lt;*&gt;</code>.</p>
+<p>Together, <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code> chain a “plain” function and multiple values in context. The values here may very well be some other sort of computations.</p>
+<pre><code>&gt; (\x y z -&gt; x + y - z) &lt;$&gt; (Just 1) &lt;*&gt; (Just 2) &lt;*&gt; (Just 3)
+Just 0</code></pre>
+<p>Beside using <code>&lt;$&gt;</code> to create functions in a context, <code>pure</code> provided by <code>Applicative</code> also lifts a “plain” function into a context.</p>
+<pre><code>&gt; pure (\x y z -&gt; x + y - z) &lt;*&gt; (Just 1) &lt;*&gt; (Just 2) &lt;*&gt; (Just 3)
+Just 0</code></pre>
+<p>Here I’d like to highlight again that just like <code>&lt;$&gt;</code>, <code>&lt;*&gt;</code> may also make decisions based on context.</p>
+<pre><code>&gt; pure (\x y z -&gt; x + y - z) &lt;*&gt; (Just 1) &lt;*&gt; Nothing &lt;*&gt; (Just 3)
+Nothing</code></pre>
+<h2 id="monad">Monad</h2>
+<p>So far we’ve seen:</p>
+<ul>
+<li>Chaining functions together (function composition).</li>
+<li>Lifting a function so that it works with values in a context (<code>&lt;$&gt;</code> and <code>&lt;*&gt;</code>).
+<ul>
+<li><code>&lt;$&gt;</code> and <code>&lt;*&gt;</code> may make decisions based on context.</li>
+</ul></li>
+</ul>
+<p>This</p>
+<pre><code>f :: a -&gt; b -&gt; c -&gt; d
+x :: m a
+y :: m b
+z :: m c
+f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code></pre>
+<p>almost feels like a software framework where you fill in your business logic <code>f</code> and data <code>x</code>, <code>y</code> and <code>z</code>, then the framework executes <code>f</code> for you with certain control flow logic embedded in itself. If we get to define <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code>, that is, design the <code>Functor</code> and <code>Applicative</code> instances ourselves, we get to control the flow as well!</p>
+<p>It’s a useful intuition but we’re limiting ourselves by thinking this way. It’s more general than this - <code>x</code>, <code>y</code> and <code>z</code> may not be just data sitting passively waiting to be consumed. For example, they may resemble computations that run validation and yield <code>Maybe</code> values.</p>
+<p>This is really powerful. But note that</p>
+<ol style="list-style-type: decimal">
+<li><code>f</code> has no way to affect the context (just look at its type). Hence it can’t in any way affect how <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code> do their jobs.</li>
+<li>While <code>x</code>, <code>y</code> and <code>z</code> compute values in a context (hence possibly affecting the control flow), they are isolated from each other.</li>
+</ol>
+<p>Now, <code>&gt;&gt;=</code> from <code>Monad</code> gives everything:</p>
+<pre><code>&gt; :t (&gt;&gt;=)
+(&gt;&gt;=) :: Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b</code></pre>
+<p>In contrast to <code>f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code>, consider</p>
+<pre><code>m &gt;&gt;= x &gt;&gt;= y &gt;&gt;= z</code></pre>
+<p>When <code>x</code>, <code>y</code> and <code>z</code> are lambdas (e.g., when we employ the do-notation), it’s really<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
+<pre><code>m &gt;&gt;= (\a1 -&gt; o &gt;&gt;= (\a2 -&gt; p &gt;&gt;= (\a3 -&gt; q)))</code></pre>
+<p>Just like <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code>, <code>&gt;&gt;=</code> may still make decisions based on context. However:</p>
+<ol style="list-style-type: decimal">
+<li><code>m</code> carries the context so it can affect how <code>&gt;&gt;=</code> makes the decision.</li>
+<li>The computations inside <code>x</code>, <code>y</code> and <code>z</code> can now access the values from <em>previous computations</em>. For example <code>p</code> can see <code>a1</code> and <code>a2</code>, so when <code>p</code> affect <code>&gt;&gt;=</code>, it could be based on <em>previous computations</em>.</li>
+</ol>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>When <code>x</code>, <code>y</code> and <code>z</code> are not lambdas it’s <code>(((m &gt;&gt;= x) &gt;&gt;= y) &gt;&gt;= z)</code> therefore doesn’t demonstrate the point.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
