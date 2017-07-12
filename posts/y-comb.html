@@ -61,37 +61,37 @@ Y f = f (Y f) = f (f (Y f)) = ...</code></pre>
 <pre><code>import Unsafe.Coerce (unsafeCoerce)
 
 y f = (\x -&gt; f (unsafeCoerce x x)) (\x -&gt; f (unsafeCoerce x x))</code></pre>
-<p>Now we’re ready to play with it to consolidate our intuition. One of the most useful things a fixed-point combinantor can do is to implement recursion without language support - this can be observed by the fact that the structure of <code>Y</code> repeats <code>F</code>. So naturally <code>F</code> should capture the calculation to be repeated. In that sense, <code>Y</code> is a <em>much</em> glorified loop. Assuming we want to calculate factorial, we can write <code>F</code> as</p>
+<p>Now we’re ready to play with it to consolidate our intuition. One of the most useful things a fixed-point combinantor can do is to implement recursion without language support - this can be observed by the fact that the structure of <code>Y</code> repeats <code>F</code>. So naturally <code>F</code> should capture the computation to be repeated. In that sense, <code>Y</code> is a <em>much</em> glorified loop. Assuming we want to compute factorial, we can write <code>F</code> as</p>
 <pre><code>c g = \n -&gt; if n == 0 then 1 else n * g (n - 1)</code></pre>
-<p>So how to come up with this? Remember again <code>c</code> is supposed to capture the calculation to be repeated, whereas <code>y</code> captures the repeating part. <code>y c</code> will return the fixed point of <code>c</code>. If we believe that <code>Y F = F (Y F)</code>, then at some point we shall see <code>y c = c (y c)</code>, hence <code>g</code> accepted by <code>c</code> should be <code>y c</code> which is the fixed point. <code>c</code> is also required to kick off the next calculation using the fixed point.</p>
+<p>So how to come up with this? Remember again <code>c</code> is supposed to capture the computation to be repeated, whereas <code>y</code> captures the repeating part. <code>y c</code> will return the fixed point of <code>c</code>. If we believe that <code>Y F = F (Y F)</code>, then at some point we shall see <code>y c = c (y c)</code>, hence <code>g</code> accepted by <code>c</code> should be <code>y c</code> which is the fixed point. <code>c</code> is also required to kick off the next computation using the fixed point.</p>
 <p>Now look at how <code>y c 3</code> yields 6 informally,</p>
 <pre><code>   y c 3                                                        -- interestingly, y only appears this one time, but its essense will be carried on in g
-=&gt; (\x -&gt; c (x x)) (\x -&gt; c (x x)) 3                            -- g 3; y c yields g, which is (\x -&gt; c (x x)) (\x -&gt; c (x x))
-=&gt; c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 3                        -- c g 3; g yields c g; remember Haskell is lazy - we apply c now
-=&gt; (\n -&gt; if n == 0 then 1 else n *                             -- c 3; the fixed point is working here: c g =&gt; c; c contains g and will kick off the next round
-     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 3
+= (\x -&gt; c (x x)) (\x -&gt; c (x x)) 3                             -- g 3; y c yields g, which is (\x -&gt; c (x x)) (\x -&gt; c (x x))
+= c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 3                         -- c g 3; g yields c g; remember Haskell is lazy - we apply c now
+= (\n -&gt; if n == 0 then 1 else n *                              -- c 3; the fixed point is working here: c g =&gt; c; c contains g and will kick off the next round
+    ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 3
 
-=&gt; 3 * ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 2                      -- 3 * g 2
-=&gt; 3 * c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 2                    -- 3 * c g 2
-=&gt; 3 * (\n -&gt; if n == 0 then 1 else n *                         -- 3 * c 2
-     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 2
+= 3 * ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 2                       -- 3 * g 2
+= 3 * c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 2                     -- 3 * c g 2
+= 3 * (\n -&gt; if n == 0 then 1 else n *                          -- 3 * c 2
+    ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 2
 
-=&gt; 3 * (2 * ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 1)                -- 3 * (2 * g 1)
-=&gt; 3 * (2 * c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 1)              -- 3 * (2 * c g 1)
-=&gt; 3 * (2 * (\n -&gt; if n == 0 then 1 else n *                    -- 3 * (2 * c 1)
-     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 1)
+= 3 * (2 * ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 1)                 -- 3 * (2 * g 1)
+= 3 * (2 * c ((\x -&gt; c (x x)) (\x -&gt; c (x x))) 1)               -- 3 * (2 * c g 1)
+= 3 * (2 * (\n -&gt; if n == 0 then 1 else n *                     -- 3 * (2 * c 1)
+    ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 1)
 
-=&gt; 3 * (2 * (1 * (((\x -&gt; c (x x)) (\x -&gt; c (x x))) 0)))        -- 3 * (2 * (1 * g 0))
-=&gt; 3 * (2 * (1 * ((c ((\x -&gt; c (x x)) (\x -&gt; c (x x)))) 0)))    -- 3 * (2 * (1 * c g 0))
-=&gt; 3 * (2 * (1 * ((\n -&gt; if n == 0 then 1 else n *              -- 3 * (2 * (1 * c 0))
-     ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 0))
-=&gt; 3 * (2 * (1 * (1)))                                          -- 3 * (2 * (1 * 1))
-=&gt; 6</code></pre>
+= 3 * (2 * (1 * (((\x -&gt; c (x x)) (\x -&gt; c (x x))) 0)))         -- 3 * (2 * (1 * g 0))
+= 3 * (2 * (1 * ((c ((\x -&gt; c (x x)) (\x -&gt; c (x x)))) 0)))     -- 3 * (2 * (1 * c g 0))
+= 3 * (2 * (1 * ((\n -&gt; if n == 0 then 1 else n *               -- 3 * (2 * (1 * c 0))
+    ((\x -&gt; c (x x)) (\x -&gt; c (x x))) (n - 1)) 0))
+= 3 * (2 * (1 * (1)))                                           -- 3 * (2 * (1 * 1))
+= 6</code></pre>
 <p>Think hard on the general pattern of <code>g =&gt; c g =&gt; c =&gt; g</code>!</p>
 <h2 id="the-call-by-value-variant">The call-by-value variant</h2>
 <p>In the first section we talked about call-by-value, which is what the majority of programming languages employ. Now here’s the call-by-value version, called the Z combinantor:</p>
 <pre><code>Z = λf. (λx. f (λy. x x y)) (λx. f (λy. x x y))</code></pre>
-<p>Notice the difference between <code>(x x)</code> and <code>(λy. x x y)</code>? That’s it. The earlier is just the point-free version of the latter! The extra <code>λy</code> allows us the delay the evaluation of <code>(x x)</code>.</p>
+<p>Notice the difference between <code>(x x)</code> and <code>(λy. x x y)</code>? That’s it. The earlier is just the point-free version of the latter! The extra <code>λy</code> allows us to delay the evaluation of <code>(x x)</code>.</p>
 <p>And the rules for call-by-value are:</p>
 <ol style="list-style-type: decimal">
 <li>Only outermost reducible expressions are reduced.</li>
@@ -117,15 +117,16 @@ print(z(c)(3))</code></pre>
 <pre><code>fix f = f (fix f)</code></pre>
 <p>And it can be used to do recursion as well:</p>
 <pre><code>   fix c 3                                                  -- fix c 3
-=&gt; c (fix c) 3                                              -- g 3
-=&gt; (\n -&gt; if n == 0 then 1 else n * (fix c) (n - 1)) 3      -- c 3; fixed point at work!
+= c (fix c) 3                                               -- g 3
+= (\n -&gt; if n == 0 then 1 else n * (fix c) (n - 1)) 3       -- c 3; fixed point at work!
 
-=&gt; 3 * (fix c) 2                                            -- 3 * fix c 2
-=&gt; 3 * c (fix c) 2                                          -- 3 * g 2
+= 3 * (fix c) 2                                             -- 3 * fix c 2
+= 3 * c (fix c) 2                                           -- 3 * g 2
 
-=&gt; 3 * (\n -&gt; if n == 0 then 1 else n * (fix c) (n - 1)) 2  -- 3 * c 2
-=&gt; ...</code></pre>
+= 3 * (\n -&gt; if n == 0 then 1 else n * (fix c) (n - 1)) 2   -- 3 * c 2
+= ...</code></pre>
 <p>So … why did we start with a much more complicated Y combinator then? Because that’s the canonical λ-calculus version that puzzled me for a long time. In λ-calculus you can’t give names to functions so you can’t make them refer to themselves, like <code>fix</code> does. Naming matters a lot!</p>
+<p>Please also see <a href="y-comb-revisited.html">The Y Combinator, Revisited</a>.</p>
 
         </div>
         <div id="footer">
