@@ -40,7 +40,7 @@ fac' :: Int -&gt; Int -&gt; Int
 fac' 1 accum = accum
 fac' n accum = fac' (n - 1) (n * accum)</code></pre>
 <p>Here, each call has ALL the information it needs to continue the computation. The compiler could apply the tail recursion optimization, making it effectively a loop.</p>
-<p>We have yet another way even more akin to “loops” in imperative programming languages. Suppose each <code>fac</code> call now returns the state, including the result (which might be incomplete/partial) and the parameter needed for the computation to go on:</p>
+<p>We have yet another way even more akin to “loops” in imperative programming languages. Suppose each <code>fac</code> call now returns the state, including the result (which might be intermediary) and the parameter needed for the computation to go on:</p>
 <pre><code>fac_step :: (Int, Int) -&gt; (Int, Int)
 fac_step (n, accum) = (n - 1, n * accum)</code></pre>
 <p>Now we can use this in ghci:</p>
