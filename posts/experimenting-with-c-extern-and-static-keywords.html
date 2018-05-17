@@ -149,166 +149,428 @@ Symbol table '.symtab' contains 19 entries:
 No version information found in this file.</code></pre>
 <p>You can also use <code>objdump -D test.o</code> but <code>readelf</code> gives a better format. Here’s the result:</p>
 <table>
-<pre><code>&lt;tr&gt;
-    &lt;th colspan=&quot;5&quot;&gt;HOW WE PUT IT&lt;/th&gt;
-    &lt;th colspan=&quot;4&quot;&gt;EFFECT&lt;/th&gt;
-&lt;/tr&gt;
-&lt;tr style=&quot;font-weight: bold&quot;&gt;
-    &lt;td&gt;symbol&lt;/td&gt;
-    &lt;td style=&quot;width: 8em&quot;&gt;code&lt;/td&gt;
-    &lt;td&gt;outside or inside any function&lt;/td&gt;
-    &lt;td&gt;&lt;em&gt;static&lt;/em&gt; or &lt;em&gt;extern&lt;/em&gt; keyword&lt;/td&gt;
-    &lt;td&gt;has initializer?&lt;/td&gt;
-    &lt;td&gt;declaration or definition&lt;/td&gt;
-    &lt;td&gt;weak or strong symbol to the linker&lt;/td&gt;
-    &lt;td&gt;(pseudo) section in .o file&lt;/td&gt;
-    &lt;td&gt;visibility&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;a&lt;/td&gt;
-    &lt;td&gt;int a;&lt;/td&gt;
-    &lt;td style=&quot;color: red&quot;&gt;outside&lt;/td&gt;
-    &lt;td&gt;none&lt;/td&gt;
-    &lt;td&gt;N&lt;/td&gt;
-    &lt;td&gt;either&lt;/td&gt;
-    &lt;td&gt;weak&lt;/td&gt;
-    &lt;td&gt;COMMON&lt;/td&gt;
-    &lt;td&gt;might be visible to other compilation units&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;b&lt;/td&gt;
-    &lt;td&gt;int b = 42;&lt;/td&gt;
-    &lt;td style=&quot;color: red&quot;&gt;outside&lt;/td&gt;
-    &lt;td&gt;none&lt;/td&gt;
-    &lt;td&gt;Y&lt;/td&gt;
-    &lt;td&gt;definition&lt;/td&gt;
-    &lt;td&gt;strong&lt;/td&gt;
-    &lt;td&gt;.data&lt;/td&gt;
-    &lt;td&gt;might be visible to other compilation units&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;c&lt;/td&gt;
-    &lt;td&gt;static int c;&lt;/td&gt;
-    &lt;td style=&quot;color: red&quot;&gt;outside&lt;/td&gt;
-    &lt;td&gt;static&lt;/td&gt;
-    &lt;td&gt;N&lt;/td&gt;
-    &lt;td&gt;definition&lt;/td&gt;
-    &lt;td&gt;weak&lt;/td&gt;
-    &lt;td&gt;.bss&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of this compilation unit&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;d&lt;/td&gt;
-    &lt;td&gt;static int d = 43;&lt;/td&gt;
-    &lt;td style=&quot;color: red&quot;&gt;outside&lt;/td&gt;
-    &lt;td&gt;static&lt;/td&gt;
-    &lt;td&gt;Y&lt;/td&gt;
-    &lt;td&gt;definition&lt;/td&gt;
-    &lt;td&gt;strong&lt;/td&gt;
-    &lt;td&gt;.data&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of this compilation unit&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;e&lt;/td&gt;
-    &lt;td&gt;extern int e;&lt;/td&gt;
-    &lt;td style=&quot;color: red&quot;&gt;outside&lt;/td&gt;
-    &lt;td&gt;extern&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;declaration&lt;/td&gt;
-    &lt;td&gt;weak&lt;/td&gt;
-    &lt;td&gt;UNDEF&lt;/td&gt;
-    &lt;td&gt;might be visible to other compilation units&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan=&quot;9&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;l&lt;/td&gt;
-    &lt;td&gt;char l;&lt;/td&gt;
-    &lt;td style=&quot;color: green&quot;&gt;inside&lt;/td&gt;
-    &lt;td&gt;none&lt;/td&gt;
-    &lt;td&gt;N&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable (lives in program stack at runtime)&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of function definition&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;m&lt;/td&gt;
-    &lt;td&gt;char m = 44;&lt;/td&gt;
-    &lt;td style=&quot;color: green&quot;&gt;inside&lt;/td&gt;
-    &lt;td&gt;none&lt;/td&gt;
-    &lt;td&gt;Y&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable (lives in program stack at runtime)&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of function definition&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;n&lt;/td&gt;
-    &lt;td&gt;static char n;&lt;/td&gt;
-    &lt;td style=&quot;color: green&quot;&gt;inside&lt;/td&gt;
-    &lt;td&gt;static&lt;/td&gt;
-    &lt;td&gt;N&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;.bss&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of function definition&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;o&lt;/td&gt;
-    &lt;td&gt;static char o = 45;&lt;/td&gt;
-    &lt;td style=&quot;color: green&quot;&gt;inside&lt;/td&gt;
-    &lt;td&gt;static&lt;/td&gt;
-    &lt;td&gt;Y&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;.data&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of function definition&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;p&lt;/td&gt;
-    &lt;td&gt;extern char p;&lt;/td&gt;
-    &lt;td style=&quot;color: green&quot;&gt;inside&lt;/td&gt;
-    &lt;td&gt;extern&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;UNDEF&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of function definition&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan=&quot;9&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;f&lt;/td&gt;
-    &lt;td&gt;void f();&lt;/td&gt;
-    &lt;td style=&quot;color: blue&quot;&gt;outside (can't be inside)&lt;/td&gt;
-    &lt;td&gt;(static doesn't make sense and extern doesn't matter)&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;declaration&lt;/td&gt;
-    &lt;td&gt;weak&lt;/td&gt;
-    &lt;td&gt;UNDEF&lt;/td&gt;
-    &lt;td&gt;might be visible to other compilation units&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;g&lt;/td&gt;
-    &lt;td&gt;void g () {...}&lt;/td&gt;
-    &lt;td style=&quot;color: blue&quot;&gt;outside (can't be inside)&lt;/td&gt;
-    &lt;td&gt;(extern doesn't make sense)&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;definition&lt;/td&gt;
-    &lt;td&gt;strong&lt;/td&gt;
-    &lt;td&gt;.text&lt;/td&gt;
-    &lt;td&gt;might be visible to other compilation units&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;td&gt;h&lt;/td&gt;
-    &lt;td&gt;static void h () {}&lt;/td&gt;
-    &lt;td style=&quot;color: blue&quot;&gt;outside (can't be inside)&lt;/td&gt;
-    &lt;td&gt;static (extern doesn't make sense)&lt;/td&gt;
-    &lt;td&gt;not applicable&lt;/td&gt;
-    &lt;td&gt;definition&lt;/td&gt;
-    &lt;td&gt;strong&lt;/td&gt;
-    &lt;td&gt;.text&lt;/td&gt;
-    &lt;td&gt;from its appearance to the end of this compilation unit&lt;/td&gt;
-&lt;/tr&gt;</code></pre>
+<tr>
+<th colspan="5">
+HOW WE PUT IT
+</th>
+<th colspan="4">
+EFFECT
+</th>
+</tr>
+<tr style="font-weight: bold">
+<td>
+symbol
+</td>
+<td style="width: 8em">
+code
+</td>
+<td>
+outside or inside any function
+</td>
+<td>
+<em>static</em> or <em>extern</em> keyword
+</td>
+<td>
+has initializer?
+</td>
+<td>
+declaration or definition
+</td>
+<td>
+weak or strong symbol to the linker
+</td>
+<td>
+(pseudo) section in .o file
+</td>
+<td>
+visibility
+</td>
+</tr>
+<tr>
+<td>
+a
+</td>
+<td>
+int a;
+</td>
+<td style="color: red">
+outside
+</td>
+<td>
+none
+</td>
+<td>
+N
+</td>
+<td>
+either
+</td>
+<td>
+weak
+</td>
+<td>
+COMMON
+</td>
+<td>
+might be visible to other compilation units
+</td>
+</tr>
+<tr>
+<td>
+b
+</td>
+<td>
+int b = 42;
+</td>
+<td style="color: red">
+outside
+</td>
+<td>
+none
+</td>
+<td>
+Y
+</td>
+<td>
+definition
+</td>
+<td>
+strong
+</td>
+<td>
+.data
+</td>
+<td>
+might be visible to other compilation units
+</td>
+</tr>
+<tr>
+<td>
+c
+</td>
+<td>
+static int c;
+</td>
+<td style="color: red">
+outside
+</td>
+<td>
+static
+</td>
+<td>
+N
+</td>
+<td>
+definition
+</td>
+<td>
+weak
+</td>
+<td>
+.bss
+</td>
+<td>
+from its appearance to the end of this compilation unit
+</td>
+</tr>
+<tr>
+<td>
+d
+</td>
+<td>
+static int d = 43;
+</td>
+<td style="color: red">
+outside
+</td>
+<td>
+static
+</td>
+<td>
+Y
+</td>
+<td>
+definition
+</td>
+<td>
+strong
+</td>
+<td>
+.data
+</td>
+<td>
+from its appearance to the end of this compilation unit
+</td>
+</tr>
+<tr>
+<td>
+e
+</td>
+<td>
+extern int e;
+</td>
+<td style="color: red">
+outside
+</td>
+<td>
+extern
+</td>
+<td>
+not applicable
+</td>
+<td>
+declaration
+</td>
+<td>
+weak
+</td>
+<td>
+UNDEF
+</td>
+<td>
+might be visible to other compilation units
+</td>
+</tr>
+<tr>
+<td colspan="9">
+</td>
+</tr>
+<tr>
+<td>
+l
+</td>
+<td>
+char l;
+</td>
+<td style="color: green">
+inside
+</td>
+<td>
+none
+</td>
+<td>
+N
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable (lives in program stack at runtime)
+</td>
+<td>
+from its appearance to the end of function definition
+</td>
+</tr>
+<tr>
+<td>
+m
+</td>
+<td>
+char m = 44;
+</td>
+<td style="color: green">
+inside
+</td>
+<td>
+none
+</td>
+<td>
+Y
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable (lives in program stack at runtime)
+</td>
+<td>
+from its appearance to the end of function definition
+</td>
+</tr>
+<tr>
+<td>
+n
+</td>
+<td>
+static char n;
+</td>
+<td style="color: green">
+inside
+</td>
+<td>
+static
+</td>
+<td>
+N
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable
+</td>
+<td>
+.bss
+</td>
+<td>
+from its appearance to the end of function definition
+</td>
+</tr>
+<tr>
+<td>
+o
+</td>
+<td>
+static char o = 45;
+</td>
+<td style="color: green">
+inside
+</td>
+<td>
+static
+</td>
+<td>
+Y
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable
+</td>
+<td>
+.data
+</td>
+<td>
+from its appearance to the end of function definition
+</td>
+</tr>
+<tr>
+<td>
+p
+</td>
+<td>
+extern char p;
+</td>
+<td style="color: green">
+inside
+</td>
+<td>
+extern
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable
+</td>
+<td>
+not applicable
+</td>
+<td>
+UNDEF
+</td>
+<td>
+from its appearance to the end of function definition
+</td>
+</tr>
+<tr>
+<td colspan="9">
+</td>
+</tr>
+<tr>
+<td>
+f
+</td>
+<td>
+void f();
+</td>
+<td style="color: blue">
+outside (can’t be inside)
+</td>
+<td>
+(static doesn’t make sense and extern doesn’t matter)
+</td>
+<td>
+not applicable
+</td>
+<td>
+declaration
+</td>
+<td>
+weak
+</td>
+<td>
+UNDEF
+</td>
+<td>
+might be visible to other compilation units
+</td>
+</tr>
+<tr>
+<td>
+g
+</td>
+<td>
+void g () {…}
+</td>
+<td style="color: blue">
+outside (can’t be inside)
+</td>
+<td>
+(extern doesn’t make sense)
+</td>
+<td>
+not applicable
+</td>
+<td>
+definition
+</td>
+<td>
+strong
+</td>
+<td>
+.text
+</td>
+<td>
+might be visible to other compilation units
+</td>
+</tr>
+<tr>
+<td>
+h
+</td>
+<td>
+static void h () {}
+</td>
+<td style="color: blue">
+outside (can’t be inside)
+</td>
+<td>
+static (extern doesn’t make sense)
+</td>
+<td>
+not applicable
+</td>
+<td>
+definition
+</td>
+<td>
+strong
+</td>
+<td>
+.text
+</td>
+<td>
+from its appearance to the end of this compilation unit
+</td>
+</tr>
 </table>
 <style>
 table,th,td { border-collapse:collapse; border: 1px solid black; }
