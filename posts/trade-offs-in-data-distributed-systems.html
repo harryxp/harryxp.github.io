@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Unfettered Mind - Trade-offs in Data/Distributed Systems</title>
+        <link rel="stylesheet" href="../css/default.css" />
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../">Unfettered Mind</a>
+            </div>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>Trade-offs in Data/Distributed Systems</h1>
+            <article>
+    <section class="header">
+        Posted on October  8, 2018
+        
+    </section>
+    <section>
+        <h2 id="scaling">Scaling</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Scaling Up (Vertical Scaling)</th>
+<th align="center">Scaling Out (Horizontal Scaling)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Easy.</td>
+<td align="center">Difficult.</td>
+</tr>
+<tr class="even">
+<td align="center">Expensive.</td>
+<td align="center">Cheap.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="relational-vs.document-models">Relational vs. Document Models</h2>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="46%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Relational Model</th>
+<th align="center">Document Model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Good at modeling all relationships including many-to-one and many-to-many.</td>
+<td align="center">Good at modeling one-to-many relationships. Bad at the others.</td>
+</tr>
+<tr class="even">
+<td align="center">Strong at joins.</td>
+<td align="center">Weak at joins.</td>
+</tr>
+<tr class="odd">
+<td align="center">Rigid schemas.</td>
+<td align="center">Flexible schemas.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="storage-engines">Storage Engines</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Log-Structured</th>
+<th align="center">Page-Oriented</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">SSTables, LSM-Trees.</td>
+<td align="center">B-Trees.</td>
+</tr>
+<tr class="even">
+<td align="center">Good for write-heavy applications.</td>
+<td align="center">Faster for reads.</td>
+</tr>
+<tr class="odd">
+<td align="center">No rewrites. Good for crash recovery.</td>
+<td align="center">Rewrites.</td>
+</tr>
+<tr class="even">
+<td align="center">Both may have indexes, which speed up reads but slow down writes.</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="oltp-vs.olap">OLTP vs. OLAP</h2>
+<table>
+<colgroup>
+<col width="51%" />
+<col width="48%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Online Transaction Processing</th>
+<th align="center">Online Analytical Processing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Optimized for many small queries.</td>
+<td align="center">Optimized for a few large queries. Need to load a lot of data.</td>
+</tr>
+<tr class="even">
+<td align="center">Use indexes to quickly find stuff (but writes are more expensive).</td>
+<td align="center">Compact storage is essential (think columnar).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="replication">Replication</h2>
+<table>
+<colgroup>
+<col width="47%" />
+<col width="52%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Synchronous Replication</th>
+<th align="center">Asynchronous Replication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Up-to-date data guaranteed everywhere.</td>
+<td align="center">Data inconsistency (eventual consistency).</td>
+</tr>
+<tr class="even">
+<td align="center">Blocking.</td>
+<td align="center">Non-blocking.</td>
+</tr>
+<tr class="odd">
+<td align="center">If leader fails, followers still have all the up-to-date data.</td>
+<td align="center">If leader fails, may lose data.</td>
+</tr>
+<tr class="even">
+<td align="center">N/A</td>
+<td align="center">Increase the capacity for serving read-only requests by adding more followers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="partitioning">Partitioning</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="center">By Key Range</th>
+<th align="center">By Hash of Key</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Tend to create hot spots.</td>
+<td align="center">No hot spots.</td>
+</tr>
+<tr class="even">
+<td align="center">Can query ranges.</td>
+<td align="center">Can’t query ranges.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cache-invalidation">Cache Invalidation</h2>
+<table style="width:100%;">
+<colgroup>
+<col width="36%" />
+<col width="26%" />
+<col width="36%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Write-through</th>
+<th align="center">Write-around</th>
+<th align="center">Write-back</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Data is written into the cache and the database at the same time.</td>
+<td align="center">Invalidate the cache and write to the database.</td>
+<td align="center">Data is written to cache alone.</td>
+</tr>
+<tr class="even">
+<td align="center">Consistency. Higher latency for writes.</td>
+<td align="center">Faster writes. Potentially more cache misses.</td>
+<td align="center">Low latency and high throughput for writes but risk of data loss.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="partitioning-1">Partitioning</h2>
+<p>Improve manageability, performance, availability, or load balancing.</p>
+<p>Lower performance of joins. Maybe mitigated by denormalization but then have to deal with inconsistency.</p>
+<p>Referential integrity can be extremely hard.</p>
+<p>Introduce rebalancing.</p>
+<table>
+<colgroup>
+<col width="24%" />
+<col width="32%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Horizontal Partitioning</th>
+<th align="center">Vertical Partitioning</th>
+<th align="center">Directory-Based Partitioning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Different rows in different partitions.</td>
+<td align="center">Different tables in different partitions.</td>
+<td align="center">Adding a layer of indirection (lookup service).</td>
+</tr>
+<tr class="even">
+<td align="center">May lead to unbalanced partitions.</td>
+<td align="center">With additional growth may need further partitioning.</td>
+<td align="center">Performance overhead. Lookup service could be a single point of failure.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="partitioning-criteria-mainly-for-horizontal-partitioning">Partitioning Criteria (mainly for Horizontal Partitioning)</h3>
+<ul>
+<li>Key or Hash-based Partitioning</li>
+<li>List Partitioning</li>
+<li>Round-robin Partitioning - mod. Don’t do this.</li>
+<li>Composite Partitioning</li>
+</ul>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
