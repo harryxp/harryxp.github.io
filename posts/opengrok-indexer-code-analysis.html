@@ -29,7 +29,7 @@
     <section>
         <p>Just trying to understand OpenGrok internals. This analysis is loosely based on 0.12.4.</p>
 <p>Essentially, the indexer does the follows:</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>build history cache</li>
 <li>for each project, create a thread running <code>IndexDatabase.update()</code></li>
 <li>each <code>IndexDatabase.update()</code> recursively processes files</li>

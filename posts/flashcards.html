@@ -40,15 +40,15 @@
 <p>Monad Laws</p>
 <ul>
 <li><p>Identity</p>
-<pre><code>(return x) &gt;&gt;= f      ≡ f x
-m          &gt;&gt;= return ≡ m
+<pre><code>  (return x) &gt;&gt;= f      ≡ f x
+  m          &gt;&gt;= return ≡ m
 
-return     &gt;=&gt; f      ≡ f
-f          &gt;=&gt; return ≡ f</code></pre></li>
+  return     &gt;=&gt; f      ≡ f
+  f          &gt;=&gt; return ≡ f</code></pre></li>
 <li><p>Associativity</p>
-<pre><code>(m &gt;&gt;= f)  &gt;&gt;= g      ≡ m &gt;&gt;= (\x -&gt; f x &gt;&gt;= g)
+<pre><code>  (m &gt;&gt;= f)  &gt;&gt;= g      ≡ m &gt;&gt;= (\x -&gt; f x &gt;&gt;= g)
 
-(f &gt;=&gt; g)  &gt;=&gt; h      ≡ f &gt;=&gt; (g &gt;=&gt; h)</code></pre></li>
+  (f &gt;=&gt; g)  &gt;=&gt; h      ≡ f &gt;=&gt; (g &gt;=&gt; h)</code></pre></li>
 </ul>
 <hr />
 <p>Power set:</p>

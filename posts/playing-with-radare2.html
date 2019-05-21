@@ -31,26 +31,26 @@
 <p>Some tricks I’ve found useful:</p>
 <ul>
 <li><p>Run it with <code>r2 -A &lt;binary&gt;</code>. <code>-A</code> does a lot for you automatically. To see the difference here’s one example where I ran it without <code>-A</code> but compensated it later by doing <code>aaa</code>:</p>
-<pre><code>[harry@desktop:/home/harry 0] r2 &lt;my-binary&gt;
- -- You can debug a program from the graph view ('ag') using standard radare2 commands
-[0x08048430]&gt; s @main
-0x80486b6
-[0x08048430]&gt; pdf @main
-p: Cannot find function at 0x080486b6
-[0x08048430]&gt; aaa
-[x] Analyze all flags starting with sym. and entry0 (aa)
-[x] Analyze len bytes of instructions for references (aar)
-[x] Analyze function calls (aac)
-[x] Use -AA or aaaa to perform additional experimental analysis.
-[x] Constructing a function name for fcn.* and sym.func.* functions (aan)
-[0x08048430]&gt; pdf @main
-            ;-- main:
-/ (fcn) sym.main 58
-|   sym.main ();</code></pre></li>
+<pre><code>  [harry@desktop:/home/harry 0] r2 &lt;my-binary&gt;
+   -- You can debug a program from the graph view ('ag') using standard radare2 commands
+  [0x08048430]&gt; s @main
+  0x80486b6
+  [0x08048430]&gt; pdf @main
+  p: Cannot find function at 0x080486b6
+  [0x08048430]&gt; aaa
+  [x] Analyze all flags starting with sym. and entry0 (aa)
+  [x] Analyze len bytes of instructions for references (aar)
+  [x] Analyze function calls (aac)
+  [x] Use -AA or aaaa to perform additional experimental analysis.
+  [x] Constructing a function name for fcn.* and sym.func.* functions (aan)
+  [0x08048430]&gt; pdf @main
+              ;-- main:
+  / (fcn) sym.main 58
+  |   sym.main ();</code></pre></li>
 <li><p>Use the Visual Mode:</p>
-<pre><code>[0x08048430]&gt; V&lt;enter&gt;</code></pre></li>
+<pre><code>  [0x08048430]&gt; V&lt;enter&gt;</code></pre></li>
 <li><p>In the Visual Mode, press <code>p</code> or <code>P</code> to rotate through panels. <a href="https://radare.gitbooks.io/radare2book/content/visual_mode/intro.html">Details.</a></p></li>
-<li><p>The Visual Mode has <a href="https://radare.gitbooks.io/radare2book/content/visual_mode/intro.html">a lot of useful commands</a>. I found jumping to functions particularly useful (<code>o &lt;function name&gt;   &lt;enter&gt;</code>).</p></li>
+<li><p>The Visual Mode has <a href="https://radare.gitbooks.io/radare2book/content/visual_mode/intro.html">a lot of useful commands</a>. I found jumping to functions particularly useful (<code>o &lt;function name&gt; &lt;enter&gt;</code>).</p></li>
 <li><p>In the Visual Mode, pressing <code>V</code> gets you the graph view, and you get a nice little minimap. Again, use <code>p</code> or <code>P</code> to rotate.</p></li>
 <li><p>In the Visual Mode, <code>:</code> gets you the command line, where you can use the online help mentioned below.</p></li>
 <li><p>In the Visual Mode, <code>c</code> gets you the cursor mode. It comes in handy when you want to redefine bytes by <code>d</code>.</p></li>

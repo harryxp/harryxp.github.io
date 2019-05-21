@@ -47,7 +47,7 @@ fact
 <pre><code>c = \f -&gt; \n -&gt; if n == 0 then 1 else n * f (n-1)</code></pre>
 <p>would hit <code>n == 0</code> first.</p>
 <p>So to turn a recursive function <code>f</code> into a non-recursive one, we could</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Devise a function <code>c</code> that’s almost the same as <code>f</code> but replace every call to itself with a call to an argument.</li>
 <li>Then <code>fix c</code> is what you want.</li>
 </ol>

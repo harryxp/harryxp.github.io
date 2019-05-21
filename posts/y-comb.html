@@ -43,7 +43,7 @@ Y f = f (Y f) = f (f (Y f)) = ...</code></pre>
 <p>One call-by-name version of Y combinator represented in λ-calculus is:</p>
 <pre><code>Y = λf. (λx. f (x x)) (λx. f (x x))</code></pre>
 <p>Call-by-name is an evaluation strategy where</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Leftmost, outermost reducible expression is always reduced first.</li>
 <li>No reductions are allowed inside abstractions.</li>
 </ol>
@@ -93,7 +93,7 @@ y f = (\x -&gt; f (unsafeCoerce x x)) (\x -&gt; f (unsafeCoerce x x))</code></pr
 <pre><code>Z = λf. (λx. f (λy. x x y)) (λx. f (λy. x x y))</code></pre>
 <p>Notice the difference between <code>(x x)</code> and <code>(λy. x x y)</code>? That’s it. The earlier is just the point-free version of the latter! The extra <code>λy</code> allows us to delay the evaluation of <code>(x x)</code>.</p>
 <p>And the rules for call-by-value are:</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Only outermost reducible expressions are reduced.</li>
 <li>A reducible expression is reduced only when its right-hand side (arguments) has already been reduced to a value.</li>
 </ol>

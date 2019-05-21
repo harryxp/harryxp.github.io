@@ -99,7 +99,7 @@ f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code></pre>
 <p>almost feels like a software framework where you fill in your business logic <code>f</code> and data <code>x</code>, <code>y</code> and <code>z</code>, then the framework executes <code>f</code> for you with certain control flow logic embedded in itself. If we get to define <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code>, that is, design the <code>Functor</code> and <code>Applicative</code> instances ourselves, we get to control the flow as well!</p>
 <p>It’s a useful intuition but we’re limiting ourselves by thinking this way. It’s more general than this - <code>x</code>, <code>y</code> and <code>z</code> may not be just data sitting passively waiting to be consumed. For example, they may resemble computations that run validation and yield <code>Maybe</code> values.</p>
 <p>This is really powerful. But note that</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><code>f</code> has no way to affect the context (just look at its type). Hence it can’t in any way affect how <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code> do their jobs.</li>
 <li>While <code>x</code>, <code>y</code> and <code>z</code> compute values in a context (hence possibly affecting the control flow), they are isolated from each other.</li>
 </ol>
@@ -108,19 +108,19 @@ f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code></pre>
 (&gt;&gt;=) :: Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b</code></pre>
 <p>In contrast to <code>f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code>, consider</p>
 <pre><code>m &gt;&gt;= x &gt;&gt;= y &gt;&gt;= z</code></pre>
-<p>When <code>x</code>, <code>y</code> and <code>z</code> are lambdas (e.g., when we employ the do-notation), it’s really<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
+<p>When <code>x</code>, <code>y</code> and <code>z</code> are lambdas (e.g., when we employ the do-notation), it’s really<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>:</p>
 <pre><code>m &gt;&gt;= (\a1 -&gt; o &gt;&gt;= (\a2 -&gt; p &gt;&gt;= (\a3 -&gt; q)))</code></pre>
 <p>Just like <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code>, <code>&gt;&gt;=</code> may still make decisions based on context. However:</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><code>m</code> carries the context so it can affect how <code>&gt;&gt;=</code> makes the decision.</li>
 <li>The computations inside <code>x</code>, <code>y</code> and <code>z</code> can now access the values from <em>previous computations</em>. For example <code>p</code> can see <code>a1</code> and <code>a2</code>, so when <code>p</code> affect <code>&gt;&gt;=</code>, it could be based on <em>previous computations</em>.</li>
 </ol>
-<div class="footnotes">
+<section class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>When <code>x</code>, <code>y</code> and <code>z</code> are not lambdas it’s <code>(((m &gt;&gt;= x) &gt;&gt;= y) &gt;&gt;= z)</code> therefore doesn’t demonstrate the point.<a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p>When <code>x</code>, <code>y</code> and <code>z</code> are not lambdas it’s <code>(((m &gt;&gt;= x) &gt;&gt;= y) &gt;&gt;= z)</code> therefore doesn’t demonstrate the point.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 </ol>
-</div>
+</section>
     </section>
 </article>
 

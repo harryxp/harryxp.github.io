@@ -31,45 +31,45 @@
 <table>
 <thead>
 <tr class="header">
-<th align="center">Scaling Up (Vertical Scaling)</th>
-<th align="center">Scaling Out (Horizontal Scaling)</th>
+<th style="text-align: center;">Scaling Up (Vertical Scaling)</th>
+<th style="text-align: center;">Scaling Out (Horizontal Scaling)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Easy.</td>
-<td align="center">Difficult.</td>
+<td style="text-align: center;">Easy.</td>
+<td style="text-align: center;">Difficult.</td>
 </tr>
 <tr class="even">
-<td align="center">Expensive.</td>
-<td align="center">Cheap.</td>
+<td style="text-align: center;">Expensive.</td>
+<td style="text-align: center;">Cheap.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="relational-vs.document-models">Relational vs. Document Models</h2>
+<h2 id="relational-vs.-document-models">Relational vs. Document Models</h2>
 <table>
 <colgroup>
-<col width="53%" />
-<col width="46%" />
+<col style="width: 53%" />
+<col style="width: 46%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center">Relational Model</th>
-<th align="center">Document Model</th>
+<th style="text-align: center;">Relational Model</th>
+<th style="text-align: center;">Document Model</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Good at modeling all relationships including many-to-one and many-to-many.</td>
-<td align="center">Good at modeling one-to-many relationships. Bad at the others.</td>
+<td style="text-align: center;">Good at modeling all relationships including many-to-one and many-to-many.</td>
+<td style="text-align: center;">Good at modeling one-to-many relationships. Bad at the others.</td>
 </tr>
 <tr class="even">
-<td align="center">Strong at joins.</td>
-<td align="center">Weak at joins.</td>
+<td style="text-align: center;">Strong at joins.</td>
+<td style="text-align: center;">Weak at joins.</td>
 </tr>
 <tr class="odd">
-<td align="center">Rigid schemas.</td>
-<td align="center">Flexible schemas.</td>
+<td style="text-align: center;">Rigid schemas.</td>
+<td style="text-align: center;">Flexible schemas.</td>
 </tr>
 </tbody>
 </table>
@@ -77,80 +77,80 @@
 <table>
 <thead>
 <tr class="header">
-<th align="center">Log-Structured</th>
-<th align="center">Page-Oriented</th>
+<th style="text-align: center;">Log-Structured</th>
+<th style="text-align: center;">Page-Oriented</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">SSTables, LSM-Trees.</td>
-<td align="center">B-Trees.</td>
+<td style="text-align: center;">SSTables, LSM-Trees.</td>
+<td style="text-align: center;">B-Trees.</td>
 </tr>
 <tr class="even">
-<td align="center">Good for write-heavy applications.</td>
-<td align="center">Faster for reads.</td>
+<td style="text-align: center;">Good for write-heavy applications.</td>
+<td style="text-align: center;">Faster for reads.</td>
 </tr>
 <tr class="odd">
-<td align="center">No rewrites. Good for crash recovery.</td>
-<td align="center">Rewrites.</td>
+<td style="text-align: center;">No rewrites. Good for crash recovery.</td>
+<td style="text-align: center;">Rewrites.</td>
 </tr>
 <tr class="even">
-<td align="center">Both may have indexes, which speed up reads but slow down writes.</td>
-<td align="center"></td>
+<td style="text-align: center;">Both may have indexes, which speed up reads but slow down writes.</td>
+<td style="text-align: center;"></td>
 </tr>
 </tbody>
 </table>
-<h2 id="oltp-vs.olap">OLTP vs. OLAP</h2>
+<h2 id="oltp-vs.-olap">OLTP vs. OLAP</h2>
 <table>
 <colgroup>
-<col width="51%" />
-<col width="48%" />
+<col style="width: 51%" />
+<col style="width: 48%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center">Online Transaction Processing</th>
-<th align="center">Online Analytical Processing</th>
+<th style="text-align: center;">Online Transaction Processing</th>
+<th style="text-align: center;">Online Analytical Processing</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Optimized for many small queries.</td>
-<td align="center">Optimized for a few large queries. Need to load a lot of data.</td>
+<td style="text-align: center;">Optimized for many small queries.</td>
+<td style="text-align: center;">Optimized for a few large queries. Need to load a lot of data.</td>
 </tr>
 <tr class="even">
-<td align="center">Use indexes to quickly find stuff (but writes are more expensive).</td>
-<td align="center">Compact storage is essential (think columnar).</td>
+<td style="text-align: center;">Use indexes to quickly find stuff (but writes are more expensive).</td>
+<td style="text-align: center;">Compact storage is essential (think columnar).</td>
 </tr>
 </tbody>
 </table>
 <h2 id="replication">Replication</h2>
 <table>
 <colgroup>
-<col width="47%" />
-<col width="52%" />
+<col style="width: 47%" />
+<col style="width: 52%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center">Synchronous Replication</th>
-<th align="center">Asynchronous Replication</th>
+<th style="text-align: center;">Synchronous Replication</th>
+<th style="text-align: center;">Asynchronous Replication</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Up-to-date data guaranteed everywhere.</td>
-<td align="center">Data inconsistency (eventual consistency).</td>
+<td style="text-align: center;">Up-to-date data guaranteed everywhere.</td>
+<td style="text-align: center;">Data inconsistency (eventual consistency).</td>
 </tr>
 <tr class="even">
-<td align="center">Blocking.</td>
-<td align="center">Non-blocking.</td>
+<td style="text-align: center;">Blocking.</td>
+<td style="text-align: center;">Non-blocking.</td>
 </tr>
 <tr class="odd">
-<td align="center">If leader fails, followers still have all the up-to-date data.</td>
-<td align="center">If leader fails, may lose data.</td>
+<td style="text-align: center;">If leader fails, followers still have all the up-to-date data.</td>
+<td style="text-align: center;">If leader fails, may lose data.</td>
 </tr>
 <tr class="even">
-<td align="center">N/A</td>
-<td align="center">Increase the capacity for serving read-only requests by adding more followers.</td>
+<td style="text-align: center;">N/A</td>
+<td style="text-align: center;">Increase the capacity for serving read-only requests by adding more followers.</td>
 </tr>
 </tbody>
 </table>
@@ -158,46 +158,46 @@
 <table>
 <thead>
 <tr class="header">
-<th align="center">By Key Range</th>
-<th align="center">By Hash of Key</th>
+<th style="text-align: center;">By Key Range</th>
+<th style="text-align: center;">By Hash of Key</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Tend to create hot spots.</td>
-<td align="center">No hot spots.</td>
+<td style="text-align: center;">Tend to create hot spots.</td>
+<td style="text-align: center;">No hot spots.</td>
 </tr>
 <tr class="even">
-<td align="center">Can query ranges.</td>
-<td align="center">Can’t query ranges.</td>
+<td style="text-align: center;">Can query ranges.</td>
+<td style="text-align: center;">Can’t query ranges.</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="cache-invalidation">Cache Invalidation</h2>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col width="36%" />
-<col width="26%" />
-<col width="36%" />
+<col style="width: 36%" />
+<col style="width: 26%" />
+<col style="width: 36%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center">Write-through</th>
-<th align="center">Write-around</th>
-<th align="center">Write-back</th>
+<th style="text-align: center;">Write-through</th>
+<th style="text-align: center;">Write-around</th>
+<th style="text-align: center;">Write-back</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Data is written into the cache and the database at the same time.</td>
-<td align="center">Invalidate the cache and write to the database.</td>
-<td align="center">Data is written to cache alone.</td>
+<td style="text-align: center;">Data is written into the cache and the database at the same time.</td>
+<td style="text-align: center;">Invalidate the cache and write to the database.</td>
+<td style="text-align: center;">Data is written to cache alone.</td>
 </tr>
 <tr class="even">
-<td align="center">Consistency. Higher latency for writes.</td>
-<td align="center">Faster writes. Potentially more cache misses.</td>
-<td align="center">Low latency and high throughput for writes but risk of data loss.</td>
+<td style="text-align: center;">Consistency. Higher latency for writes.</td>
+<td style="text-align: center;">Faster writes. Potentially more cache misses.</td>
+<td style="text-align: center;">Low latency and high throughput for writes but risk of data loss.</td>
 </tr>
 </tbody>
 </table>
@@ -208,27 +208,27 @@
 <p>Introduce rebalancing.</p>
 <table>
 <colgroup>
-<col width="24%" />
-<col width="32%" />
-<col width="43%" />
+<col style="width: 23%" />
+<col style="width: 32%" />
+<col style="width: 43%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center">Horizontal Partitioning</th>
-<th align="center">Vertical Partitioning</th>
-<th align="center">Directory-Based Partitioning</th>
+<th style="text-align: center;">Horizontal Partitioning</th>
+<th style="text-align: center;">Vertical Partitioning</th>
+<th style="text-align: center;">Directory-Based Partitioning</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Different rows in different partitions.</td>
-<td align="center">Different tables in different partitions.</td>
-<td align="center">Adding a layer of indirection (lookup service).</td>
+<td style="text-align: center;">Different rows in different partitions.</td>
+<td style="text-align: center;">Different tables in different partitions.</td>
+<td style="text-align: center;">Adding a layer of indirection (lookup service).</td>
 </tr>
 <tr class="even">
-<td align="center">May lead to unbalanced partitions.</td>
-<td align="center">With additional growth may need further partitioning.</td>
-<td align="center">Performance overhead. Lookup service could be a single point of failure.</td>
+<td style="text-align: center;">May lead to unbalanced partitions.</td>
+<td style="text-align: center;">With additional growth may need further partitioning.</td>
+<td style="text-align: center;">Performance overhead. Lookup service could be a single point of failure.</td>
 </tr>
 </tbody>
 </table>

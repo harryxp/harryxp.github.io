@@ -52,7 +52,7 @@ Prelude Control.Monad&gt; filterM (\_ -&gt; [True,True,False]) [1]
 Prelude Control.Monad&gt; filterM (\_ -&gt; [True,True,False]) [2,1]
 [[2,1],[2,1],[2],[2,1],[2,1],[2],[1],[1],[]]</code></pre>
 <p>Did you get it? I’d see it this way:</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><code>filterM</code> takes two arguments - a predicate and a list, returns a list of lists.</li>
 <li>Remember the predicate is applied to each element in the list.</li>
 <li>Strip down the argument list to the last element. (First reducing the problem to the bare minimum is a good way to understand recursive algorithms.)</li>

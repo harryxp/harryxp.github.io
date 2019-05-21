@@ -54,21 +54,21 @@ Prelude&gt; fac_step (2,12)      -- fac 2 with accum = 12
 <pre><code>Prelude&gt; snd $ until ((==1) . fst) fac_step (4,1)
 24</code></pre>
 <p>This is a common enough pattern that there’s a monad for it. The <em>Introducing State</em> section of <a href="https://en.wikibooks.org/wiki/Haskell/Understanding_monads/State">this wikibooks page</a> does a good job describing it. Essentially:</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>The purpose is to compose/bind a series of computations together. Each computation takes some state, produces some result plus some new state.</li>
 <li>The <code>State</code> monad is a wrapper of a function called <code>runState</code>, thus it’s more or less equivalent to this function. The name <code>State</code> is a bit of a misnomer.</li>
 <li>The field <code>runState :: s -&gt; (a, s)</code> also acts as the accessor of a <code>State</code> record. That is, it can be seen as a function that takes a value of type <code>State</code> and returns a value of type <code>s -&gt; (a, s)</code>. We can call this the <em>state processor</em>.</li>
 <li><code>state :: (s -&gt; (a, s)) -&gt; State s a</code> can be used to construct a <code>State</code>.</li>
 <li><p><code>return</code> calls <code>state</code>:</p>
-<pre><code>instance Monad (State s) where
-    return :: a -&gt; State s a
-    return x = state ( \st -&gt; (x, st) )</code></pre></li>
+<pre><code> instance Monad (State s) where
+     return :: a -&gt; State s a
+     return x = state ( \st -&gt; (x, st) )</code></pre></li>
 <li><p>The most important part is always how <code>bind</code> works:</p>
-<pre><code>instance Monad (State s) where
-    (&gt;&gt;=) :: State s a -&gt; (a -&gt; State s b) -&gt; State s b
-    pr &gt;&gt;= k = state $ \st -&gt;
-       let (x, st') = runState pr st    -- Running the first processor on st.
-          in runState (k x) st'         -- Running the second processor on st'.</code></pre></li>
+<pre><code> instance Monad (State s) where
+     (&gt;&gt;=) :: State s a -&gt; (a -&gt; State s b) -&gt; State s b
+     pr &gt;&gt;= k = state $ \st -&gt;
+        let (x, st') = runState pr st    -- Running the first processor on st.
+           in runState (k x) st'         -- Running the second processor on st'.</code></pre></li>
 </ol>
 <p>Another working example demonstrating the State monad:</p>
 <pre><code>import Control.Monad              (return)
