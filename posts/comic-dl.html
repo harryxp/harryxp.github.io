@@ -23,23 +23,25 @@
             <h1>comic-dl</h1>
             <article>
     <section class="header">
-        Posted on November 16, 2018
+        Posted on September 17, 2019
         
     </section>
     <section>
         <p>I’ve been enjoying <a href="https://github.com/Xonshiz/comic-dl">comic-dl</a>.</p>
-<h2 id="installation">Installation</h2>
-<pre><code>git clone https://github.com/Xonshiz/comic-dl
-cd comic-dl
-virtualenv -p /usr/bin/python2.7 venv
-source venv/bin/activate
-pip install -r requirements.txt</code></pre>
-<h2 id="downloading-comics">Downloading comics</h2>
-<pre><code>cd comic-dl
-source venv/bin/activate
-python comic_dl/__main__.py -dd &lt;output directory&gt; -i &lt;url&gt;</code></pre>
-<h2 id="enjoy">Enjoy!</h2>
-<pre><code>feh --scale-down &lt;directory containing comic files&gt;</code></pre>
+<ul>
+<li><p>Installation</p>
+<div class="sourceCode" id="cb1" data-org-language="sh"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">git</span> clone https://github.com/Xonshiz/comic-dl</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="bu">cd</span> comic-dl</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="ex">python</span> -m venv venv</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="bu">source</span> venv/bin/activate</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="ex">pip</span> install -r requirements.txt</span></code></pre></div></li>
+<li><p>Downloading comics</p>
+<div class="sourceCode" id="cb2" data-org-language="sh"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">cd</span> comic-dl</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="bu">source</span> venv/bin/activate</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="ex">python</span> comic_dl/__main__.py -dd <span class="op">&lt;</span>output directory<span class="op">&gt;</span> -i <span class="op">&lt;</span>url<span class="op">&gt;</span></span></code></pre></div></li>
+<li><p>Enjoy!</p>
+<div class="sourceCode" id="cb3" data-org-language="sh"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">feh</span> --scale-down <span class="op">&lt;</span>directory containing comic files<span class="op">&gt;</span></span></code></pre></div></li>
+</ul>
     </section>
 </article>
 

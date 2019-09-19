@@ -108,17 +108,17 @@ f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code></pre>
 (&gt;&gt;=) :: Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b</code></pre>
 <p>In contrast to <code>f &lt;$&gt; x &lt;*&gt; y &lt;*&gt; z</code>, consider</p>
 <pre><code>m &gt;&gt;= x &gt;&gt;= y &gt;&gt;= z</code></pre>
-<p>When <code>x</code>, <code>y</code> and <code>z</code> are lambdas (e.g., when we employ the do-notation), it’s really<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>:</p>
+<p>When <code>x</code>, <code>y</code> and <code>z</code> are lambdas (e.g., when we employ the do-notation), it’s really<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
 <pre><code>m &gt;&gt;= (\a1 -&gt; o &gt;&gt;= (\a2 -&gt; p &gt;&gt;= (\a3 -&gt; q)))</code></pre>
 <p>Just like <code>&lt;$&gt;</code> and <code>&lt;*&gt;</code>, <code>&gt;&gt;=</code> may still make decisions based on context. However:</p>
 <ol type="1">
 <li><code>m</code> carries the context so it can affect how <code>&gt;&gt;=</code> makes the decision.</li>
 <li>The computations inside <code>x</code>, <code>y</code> and <code>z</code> can now access the values from <em>previous computations</em>. For example <code>p</code> can see <code>a1</code> and <code>a2</code>, so when <code>p</code> affect <code>&gt;&gt;=</code>, it could be based on <em>previous computations</em>.</li>
 </ol>
-<section class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>When <code>x</code>, <code>y</code> and <code>z</code> are not lambdas it’s <code>(((m &gt;&gt;= x) &gt;&gt;= y) &gt;&gt;= z)</code> therefore doesn’t demonstrate the point.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p>When <code>x</code>, <code>y</code> and <code>z</code> are not lambdas it’s <code>(((m &gt;&gt;= x) &gt;&gt;= y) &gt;&gt;= z)</code> therefore doesn’t demonstrate the point.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
     </section>
